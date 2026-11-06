@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300"><rect width="960" height="300" fill="#1D1D1D"/><text x="40" y="214" font-family="Poppins, sans-serif" font-weight="700" font-size="120" fill="#FFFFFF" letter-spacing="-2.4">Sling</text><text x="44" y="272" font-family="Lato, sans-serif" font-size="14" fill="#9A9A9A">Small stone. Giant impact.</text>
+  <rect fill="#FFFFFF" x="480" y="0" width="288" height="300"/>
+  <rect fill="#0ADBDE" x="768" y="0" width="192" height="204"/>
+  <rect fill="#2A2A2C" x="768" y="204" width="192" height="96"/>
+  <rect fill="#2A2A2C" x="480" y="236" width="96" height="64"/>
+  <circle fill="#0ADBDE" cx="520" cy="200" r="4"/>
+  <circle fill="#0ADBDE" cx="560" cy="168" r="6"/>
+  <circle fill="#0ADBDE" cx="606" cy="138" r="8"/>
+  <circle fill="#0ADBDE" cx="658" cy="112" r="12"/>
+  <circle fill="#0ADBDE" cx="716" cy="92" r="16"/>
+  <circle fill="#131313" cx="806" cy="80" r="24"/>
+  <circle fill="#131313" cx="900" cy="76" r="32"/>
+</svg>

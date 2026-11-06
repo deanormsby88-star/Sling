@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en-GB" data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sling components preview</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Lato:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components/react/sling-components.css">
+<style>section{padding:48px max(16px,5vw);display:flex;flex-direction:column;gap:40px;background:var(--surface)}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}ol.row{list-style:none;margin:0;padding:0}.btns{display:flex;gap:16px;flex-wrap:wrap;align-items:center}h2{margin:0}</style>
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+/* @ds-bundle: {"format":4,"namespace":"Sling","components":[{"name":"Button"},{"name":"Eyebrow"},{"name":"Stat"},{"name":"FeatureCard"},{"name":"PhaseStep"}]} */
+(function () {
+  var React = window.React, h = React.createElement;
+  function cx() { return Array.prototype.filter.call(arguments, Boolean).join(" "); }
+  function Button(p) {
+    var v = p.variant || "primary", isLink = !!p.href;
+    return h(isLink ? "a" : "button", {
+      className: cx("sl-btn", "sl-btn--" + v, p.className),
+      href: isLink ? p.href : undefined,
+      type: isLink ? undefined : (p.type || "button"),
+      disabled: isLink ? undefined : p.disabled,
+      onClick: p.onClick
+    }, p.children, v === "ghost" ? h("span", { className: "sl-btn__arrow", "aria-hidden": "true" }, " →") : null);
+  }
+  function Eyebrow(p) {
+    return h(p.as || "p", { className: cx("sl-eyebrow", p.className) },
+      h("span", { className: "sl-eyebrow__dot", "aria-hidden": "true" }), p.children);
+  }
+  function Stat(p) {
+    return h("figure", { className: cx("sl-stat", p.className) },
+      h("div", { className: "sl-stat__value" }, p.value),
+      h("figcaption", { className: "sl-stat__caption" },
+        h("span", { className: "sl-stat__label" }, p.label),
+        p.note ? h("span", { className: "sl-stat__note" }, p.note) : null,
+        p.source ? h("cite", { className: "sl-stat__source" }, "Source: " + p.source) : null));
+  }
+  function FeatureCard(p) {
+    return h("article", { className: cx("sl-card", p.className) },
+      p.eyebrow ? h(Eyebrow, null, p.eyebrow) : null,
+      h("h3", { className: "sl-card__title" }, p.title),
+      h("div", { className: "sl-card__body" }, p.children));
+  }
+  function PhaseStep(p) {
+    return h("li", { className: cx("sl-step", p.className) },
+      h("div", { className: "sl-step__num", "aria-hidden": "true" }, p.number),
+      p.window ? h("p", { className: "sl-step__window" }, p.window) : null,
+      h("h3", { className: "sl-step__title" }, p.title),
+      p.items && p.items.length ? h("ul", { className: "sl-step__list" },
+        p.items.map(function (t, i) { return h("li", { key: i }, t); })) : null);
+  }
+  window.Sling = Object.assign(window.Sling || {}, { Button: Button, Eyebrow: Eyebrow, Stat: Stat, FeatureCard: FeatureCard, PhaseStep: PhaseStep });
+})();
+
+</script>
+</head>
+<body>
+<section data-theme="dark" id="dark"></section>
+<section data-theme="light" id="light"></section>
+<script>
+var S = window.Sling, h = React.createElement;
+function demo(theme){ return h(React.Fragment, null,
+  h(S.Eyebrow, null, theme + " theme"), h("h2", {className:"heading-1"}, "One client. Three to five roles. Ninety days."),
+  h("div", {className:"btns"}, h(S.Button, null, "Book a pilot call"), h(S.Button, {variant:"secondary"}, "See open roles"), h(S.Button, {variant:"ghost", href:"#"}, "How the pilot works")),
+  h("div", {className:"row"},
+    h(S.Stat, {value:"33.6%", label:"Official unemployment rate", note:"Up from 32.7% one quarter earlier", source:"Stats SA, QLFS Q2 2026"}),
+    h(S.Stat, {value:"115,000", label:"New international jobs in SA", note:"2019 to 2024", source:"BPESA, 2025"}),
+    h(S.Stat, {value:"40\u201355%", label:"Below equivalent US/UK hiring", note:"Indicative; depends on role and scope"})),
+  h("div", {className:"row"},
+    h(S.FeatureCard, {eyebrow:"Launch", title:"Finance and accounting"}, h("p", null, "Bookkeeping, management accounts, AP/AR and audit support.")),
+    h(S.FeatureCard, {eyebrow:"Next", title:"Skilled operations"}, h("p", null, "Claims, paralegal, executive support and analytics.")),
+    h(S.FeatureCard, {eyebrow:"Scale", title:"Customer experience"}, h("p", null, "Premium support, sales and client success."))),
+  h("ol", {className:"row"},
+    h(S.PhaseStep, {number:"01", window:"Days 0\u201330", title:"Design", items:["Select the process","Set scope, KPIs and security","Agree pricing and governance"]}),
+    h(S.PhaseStep, {number:"02", window:"Days 31\u201360", title:"Build", items:["Recruit and shortlist","Client interviews and selection","Onboard people and systems"]}),
+    h(S.PhaseStep, {number:"03", window:"Days 61\u201390", title:"Prove", items:["Go live with weekly QA","Track quality, savings and uptime","Decide: scale, refine or stop"]})));}
+ReactDOM.createRoot(document.getElementById("dark")).render(demo("Dark"));
+ReactDOM.createRoot(document.getElementById("light")).render(demo("Light"));
+</script>
+</body>
+</html>
