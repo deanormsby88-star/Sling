@@ -13,7 +13,7 @@ This repository is the marketing website for **Sling**, a South African company 
 
 ## Working agreement
 
-- Build in the four passes in the brief, and **stop for review after each pass**. Begin by proposing the project structure and waiting for approval.
+- **Keep it simple (Dean's decision, Nov 2026).** The site is a plain static marketing site in `site/`: HTML and CSS only, no framework, no build step, no web forms. Calls to action open an email (`mailto:`). The brief's Next.js stack, forms, CV upload and CRM routing are deferred.
 - Keep `docs/OPEN-ITEMS.md` up to date with every placeholder you use and every decision Dean still needs to make.
 - Ask before adding a paid service, a new dependency over ~50 kB, or any third-party script.
 
