@@ -1,0 +1,61 @@
+name: Trendspotter daily email
+
+on:
+  schedule:
+    - cron: "37 3 * * *" # 05:37 SAST every day, so the email is in by about 06:00
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Force a cadence (blank = auto: Monday weekly, 1st of month monthly)"
+        required: false
+        type: choice
+        options: ["", daily, weekly, monthly]
+
+permissions:
+  contents: read
+
+concurrency: trendspotter
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: trendspotter
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: trendspotter/requirements.txt
+
+      - run: pip install -r requirements.txt
+
+      # Score history lives in the Actions cache, not in the repo, so the
+      # watchlist and scores stay private. Each run restores the latest copy.
+      - name: Restore score history
+        uses: actions/cache/restore@v4
+        with:
+          path: trendspotter/state
+          key: trendspotter-state-${{ github.run_id }}
+          restore-keys: trendspotter-state-
+
+      - name: Build and send report
+        run: python main.py ${{ inputs.mode && format('--mode {0}', inputs.mode) || '' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+
+      - name: Save score history
+        uses: actions/cache/save@v4
+        with:
+          path: trendspotter/state
+          key: trendspotter-state-${{ github.run_id }}

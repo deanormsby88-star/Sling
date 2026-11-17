@@ -1,0 +1,166 @@
+{
+ "headline": "SAMPLE REPORT for checking the layout. No real research was run.",
+ "trends": [
+  {
+   "name": "Squishy / sensory squeeze toys",
+   "aliases": [],
+   "ip_status": "generic",
+   "scores": {
+    "velocity": 4,
+    "cross_platform": 5,
+    "age_fit": 5,
+    "sourcing": 5,
+    "runway": 4,
+    "margin": 4,
+    "longevity": 4
+   },
+   "evidence": [
+    {
+     "source": "Circana",
+     "finding": "Tactile and sensory toys 6x year on year to Sep 2026",
+     "url": ""
+    },
+    {
+     "source": "Toy World",
+     "finding": "NeeDoh on UK DreamToys list, Nov 2026",
+     "url": ""
+    }
+   ],
+   "why_now": "SAMPLE: illustrative text only.",
+   "age_fit_note": "SAMPLE",
+   "sourcing_route": "SAMPLE",
+   "projected_sa_peak": "Mar 2027",
+   "months_to_sa_peak": 4,
+   "next_step": "SAMPLE",
+   "tiktok_change": "n/a",
+   "google_trends_change": "n/a",
+   "amazon_rank_change": "n/a",
+   "takealot_status": "n/a",
+   "safety_recall_active": false,
+   "only_ip_lookalikes_sourceable": false,
+   "seen_today": true
+  },
+  {
+   "name": "Bag-charm plush and keychains",
+   "aliases": [],
+   "ip_status": "generic",
+   "scores": {
+    "velocity": 3,
+    "cross_platform": 4,
+    "age_fit": 3,
+    "sourcing": 5,
+    "runway": 4,
+    "margin": 4,
+    "longevity": 3
+   },
+   "evidence": [
+    {
+     "source": "Toy Book",
+     "finding": "Keychains and plush clips +200% (Circana)",
+     "url": ""
+    }
+   ],
+   "why_now": "SAMPLE: illustrative text only.",
+   "age_fit_note": "SAMPLE",
+   "sourcing_route": "SAMPLE",
+   "projected_sa_peak": "Mar 2027",
+   "months_to_sa_peak": 6,
+   "next_step": "SAMPLE",
+   "tiktok_change": "n/a",
+   "google_trends_change": "n/a",
+   "amazon_rank_change": "n/a",
+   "takealot_status": "n/a",
+   "safety_recall_active": false,
+   "only_ip_lookalikes_sourceable": false,
+   "seen_today": true
+  },
+  {
+   "name": "KPop Demon Hunters",
+   "aliases": [],
+   "ip_status": "licensed",
+   "scores": {
+    "velocity": 3,
+    "cross_platform": 4,
+    "age_fit": 4,
+    "sourcing": 1,
+    "runway": 3,
+    "margin": 2,
+    "longevity": 3
+   },
+   "evidence": [
+    {
+     "source": "DreamToys",
+     "finding": "Huntr/x Singing Dolls on Nov 2026 list",
+     "url": ""
+    }
+   ],
+   "why_now": "SAMPLE: illustrative text only.",
+   "age_fit_note": "SAMPLE",
+   "sourcing_route": "licensed distributor only",
+   "projected_sa_peak": "Mar 2027",
+   "months_to_sa_peak": 4,
+   "next_step": "SAMPLE",
+   "tiktok_change": "n/a",
+   "google_trends_change": "n/a",
+   "amazon_rank_change": "n/a",
+   "takealot_status": "n/a",
+   "safety_recall_active": false,
+   "only_ip_lookalikes_sourceable": false,
+   "seen_today": true
+  },
+  {
+   "name": "Labubu / Pop Mart",
+   "aliases": [],
+   "ip_status": "proprietary",
+   "scores": {
+    "velocity": 0,
+    "cross_platform": 3,
+    "age_fit": 1,
+    "sourcing": 0,
+    "runway": 1,
+    "margin": 2,
+    "longevity": 0
+   },
+   "evidence": [
+    {
+     "source": "Pop Mart HKEX",
+     "finding": "Q3 2026 revenue -45-50% y/y",
+     "url": ""
+    }
+   ],
+   "why_now": "SAMPLE: illustrative text only.",
+   "age_fit_note": "SAMPLE",
+   "sourcing_route": "SAMPLE",
+   "projected_sa_peak": "Mar 2027",
+   "months_to_sa_peak": 4,
+   "next_step": "SAMPLE",
+   "tiktok_change": "n/a",
+   "google_trends_change": "n/a",
+   "amazon_rank_change": "n/a",
+   "takealot_status": "n/a",
+   "safety_recall_active": false,
+   "only_ip_lookalikes_sourceable": false,
+   "seen_today": false
+  }
+ ],
+ "licensing_pipeline": [
+  {
+   "item": "SAMPLE pipeline item",
+   "date": "2027",
+   "note": "SAMPLE",
+   "url": ""
+  }
+ ],
+ "sa_market_pulse": [
+  "SAMPLE: Durban port status line."
+ ],
+ "risk_alerts": [
+  {
+   "alert": "SAMPLE: squishy microwave burn warnings",
+   "url": ""
+  }
+ ],
+ "data_gaps": [
+  "SAMPLE: TikTok Creative Center blocked"
+ ]
+}
