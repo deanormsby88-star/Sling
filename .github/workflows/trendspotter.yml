@@ -1,15 +1,16 @@
-name: Trendspotter daily email
+name: Trendspotter weekly email
 
 on:
   schedule:
-    - cron: "37 3 * * *" # 05:37 SAST every day, so the email is in by about 06:00
+    - cron: "7 3 * * 5" # Friday 05:07 SAST: the weekly deep-dive, in your inbox by about 06:00
+    - cron: "23 4 * * 2" # Tuesday: no API calls, only keeps the score history cache from expiring
   workflow_dispatch:
     inputs:
       mode:
-        description: "Force a cadence (blank = auto: Monday weekly, 1st of month monthly)"
+        description: "Force a cadence (blank = auto: weekly, or monthly on the first Friday)"
         required: false
         type: choice
-        options: ["", daily, weekly, monthly]
+        options: ["", weekly, monthly]
 
 permissions:
   contents: read
@@ -18,8 +19,9 @@ concurrency: trendspotter
 
 jobs:
   report:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '7 3 * * 5'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: trendspotter
@@ -59,3 +61,16 @@ jobs:
         with:
           path: trendspotter/state
           key: trendspotter-state-${{ github.run_id }}
+
+  # GitHub deletes cache entries not used for 7 days, which is exactly the gap
+  # between Friday runs. Restoring the cache mid-week keeps it alive. Costs nothing.
+  keep-history-alive:
+    if: github.event.schedule == '23 4 * * 2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/cache/restore@v4
+        with:
+          path: trendspotter/state
+          key: trendspotter-state-keepalive
+          restore-keys: trendspotter-state-

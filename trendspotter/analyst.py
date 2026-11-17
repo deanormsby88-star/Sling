@@ -14,7 +14,7 @@ from models import Report
 
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
-SYSTEM = f"""You are the research analyst behind the {config.REPORT_NAME}, a daily email for Dean, who runs
+SYSTEM = f"""You are the research analyst behind the {config.REPORT_NAME}, a weekly email (sent on Fridays) for Dean, who runs
 Just Imagine, a South African toy importer. Dean imports from China to Johannesburg via Durban and sells
 toys for children aged 5 to 9, mostly in the R100-R500 price band.
 
@@ -60,7 +60,7 @@ def research(context: str, mode: str) -> str:
     messages: list = [{"role": "user", "content": context}]
     notes: list[str] = []
     client = _client()
-    for _ in range(6):  # allow a few pause_turn continuations
+    for _ in range(10):  # allow pause_turn continuations on the long weekly run
         with client.beta.messages.stream(
             model=config.MODEL,
             max_tokens=64000,
@@ -86,11 +86,11 @@ def structure(context: str, notes: str) -> Report:
     prompt = f"""Below are today's briefing context and your research notes. Turn them into the report.
 
 Rules:
-- Include every watchlist item, plus up to 6 new candidate trends you found. Merge synonyms into one trend
+- Include every watchlist item, plus up to {config.MAX_NEW_CANDIDATES} new candidate trends you found. Merge synonyms into one trend
   (e.g. "NeeDoh", "Nee Doh" and "squishy cube" belong to "Squishy / sensory squeeze toys").
-- Score each factor 0-5 using only evidence in the notes. If a watchlist item had no fresh signal today, keep
+- Score each factor 0-5 using only evidence in the notes. If a watchlist item had no fresh signal this week, keep
   its scores close to its last scores and set seen_today to false.
-- Up to 4 evidence items per trend, each with a number and source where possible.
+- Up to 5 evidence items per trend, each with a number and source where possible.
 - Do not invent URLs. Use an empty string if you have none.
 
 <briefing_context>

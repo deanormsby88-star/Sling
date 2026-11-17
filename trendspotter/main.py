@@ -4,7 +4,7 @@ Usage:
   python main.py                 # full run, sends the email
   python main.py --no-email      # full run, writes the report to out/ only
   python main.py --sample        # no API calls: renders a sample report to out/ (for checking the layout)
-  python main.py --mode weekly   # force a cadence (default: Monday = weekly, 1st of month = monthly)
+  python main.py --mode monthly  # force a cadence (default: weekly; the first Friday of the month = monthly)
 """
 
 from __future__ import annotations
@@ -28,11 +28,8 @@ OUT = Path(__file__).parent / "out"
 
 
 def pick_mode(today) -> str:
-    if today.day == 1:
-        return "monthly"
-    if today.weekday() == 0:
-        return "weekly"
-    return "daily"
+    """The report runs weekly; the first run of each month also does the monthly sweep."""
+    return "monthly" if today.day <= 7 else "weekly"
 
 
 def build_context(today, mode: str, state: dict, collected_text: str, calendar) -> str:
@@ -42,17 +39,23 @@ def build_context(today, mode: str, state: dict, collected_text: str, calendar) 
     cal = "\n".join(f"- {w}: {e}" for w, e, _ in calendar) or "(none)"
     return f"""Today is {today.strftime('%A %d %B %Y')} (SAST). This is the {mode} run.
 
-Research these sources with web search and web fetch, prioritising signals from the last 1-7 days:
+This is a once-a-week deep dive, so be thorough: check every source below, follow up promising leads with
+web fetch, and confirm each trend on as many independent platforms as you can. Prioritise signals from the
+last 7 days, and give 4-week context (direction of travel) where you can find it.
+
+Research these sources with web search and web fetch:
 {chr(10).join('- ' + s for s in sources)}
 
 Current watchlist (re-check each one, then look for new candidates for ages 5-9):
 {history.watchlist_text(state, today)}
 
-Headlines collected automatically from trade RSS, Google News and Reddit (use as leads; verify what matters):
+Headlines from the last 8 days, collected automatically from trade RSS, Google News and Reddit (use as leads; verify what matters):
 {collected_text}
 
 SA calendar, next 60 days:
 {cal}
+
+Look actively for new candidate trends for ages 5-9 (up to {config.MAX_NEW_CANDIDATES}), not just the watchlist.
 
 Write research notes covering, for each watchlist item and each new candidate: the signals you found with numbers,
 dates and URLs (TikTok, Google Trends ZA/US/UK, Amazon, Takealot, YouTube, trade press, retailers), the 5-9 age fit,
@@ -96,7 +99,7 @@ def main() -> int:
         scored.append(render.Scored(
             trend=t, score=s, band=band, band_reason=reason,
             since_last=history.last_score(state, t.name, today),
-            change_7d=history.change_7d(state, t.name, today, s),
+            change_4w=history.change_4w(state, t.name, today, s),
         ))
         if scored[-1].since_last is not None:
             scored[-1].since_last = s - scored[-1].since_last

@@ -39,8 +39,8 @@ def score_on_or_before(state: dict, name: str, day: date) -> int | None:
     return scores[earlier[-1]] if earlier else None
 
 
-def change_7d(state: dict, name: str, today: date, score: int) -> int | None:
-    prev = score_on_or_before(state, name, today - timedelta(days=7))
+def change_4w(state: dict, name: str, today: date, score: int) -> int | None:
+    prev = score_on_or_before(state, name, today - timedelta(days=28))
     return None if prev is None else score - prev
 
 

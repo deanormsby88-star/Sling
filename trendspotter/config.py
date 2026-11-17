@@ -11,9 +11,11 @@ REPORT_NAME = "Just Imagine Trendspotter"
 
 # Claude model and spend controls. Override with environment variables.
 MODEL = os.environ.get("TRENDSPOTTER_MODEL", "claude-opus-5-5")
-EFFORT = os.environ.get("TRENDSPOTTER_EFFORT", "medium")  # low | medium | high
-MAX_WEB_SEARCHES = {"daily": 20, "weekly": 30, "monthly": 35}
-MAX_WEB_FETCHES = {"daily": 10, "weekly": 15, "monthly": 15}
+EFFORT = os.environ.get("TRENDSPOTTER_EFFORT", "high")  # low | medium | high | xhigh
+# One deep run a week (Friday). The first Friday of the month adds the monthly sources.
+MAX_WEB_SEARCHES = {"daily": 20, "weekly": 45, "monthly": 55}
+MAX_WEB_FETCHES = {"daily": 10, "weekly": 25, "monthly": 30}
+MAX_NEW_CANDIDATES = 10
 
 # ---------------------------------------------------------------------------
 # Seed watchlist. The agent re-scores these every day and adds new candidates.
@@ -116,7 +118,7 @@ WEIGHTS = {
 }
 BANDS = [(75, "ACT"), (55, "PREPARE"), (35, "WATCH"), (0, "IGNORE")]
 MIN_MONTHS_TO_SA_PEAK_FOR_ACT = 4  # import runway rule: 10-16 weeks
-RISING_THRESHOLD = 10  # points up since the last report
+RISING_THRESHOLD = 10  # points up since last week's report
 RETIRE_AFTER_DAYS = 30  # monthly clean-up of trends no longer seen
 
 # ---------------------------------------------------------------------------

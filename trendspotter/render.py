@@ -1,4 +1,4 @@
-"""Render the daily report as an HTML email (inline styles) and a plain-text version."""
+"""Render the weekly report as an HTML email (inline styles) and a plain-text version."""
 
 from __future__ import annotations
 
@@ -19,8 +19,8 @@ class Scored:
     score: int
     band: str
     band_reason: str
-    since_last: int | None  # change since the previous report; None = new
-    change_7d: int | None
+    since_last: int | None  # change since last week's report; None = new
+    change_4w: int | None
 
 
 def _fmt_delta(d: int | None, new_label: str = "new") -> str:
@@ -53,7 +53,7 @@ def _trend_card(s: Scored) -> str:
     ev = "".join(f"<li>{escape(e.source)}: {_link(e.finding, e.url)}</li>" for e in t.evidence[:3])
     note = f"<br><em>{escape(s.band_reason)}</em>" if s.band_reason else ""
     return f"""<div style="border:1px solid #ddd;border-radius:4px;padding:10px 12px;margin:8px 0">
-<strong>{escape(t.name)}</strong> {_badge(s.band)} <strong>{s.score}</strong>/100 ({_fmt_delta(s.since_last)} since last report){note}
+<strong>{escape(t.name)}</strong> {_badge(s.band)} <strong>{s.score}</strong>/100 ({_fmt_delta(s.since_last)} since last week){note}
 <p style="margin:6px 0"><strong>Why now:</strong> {escape(t.why_now)}</p>
 <ul style="margin:4px 0 4px 18px;padding:0">{ev}</ul>
 <p style="margin:4px 0"><strong>5-9 fit:</strong> {escape(t.age_fit_note)}<br>
@@ -68,8 +68,8 @@ def html(report: Report, scored: list[Scored], today: date, mode: str,
     prep = [s for s in scored if s.band == "PREPARE"]
     flagged = [s for s in scored if s.band == "RED FLAG"]
     parts = [f"""<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#222;max-width:760px">
-<h1 style="font-size:20px;margin:0 0 4px">{escape(config.REPORT_NAME.upper())}: {today.strftime('%A %d %B %Y')}</h1>
-<p style="color:#666;margin:0 0 12px">{mode.capitalize()} report. Ages 5-9, South Africa.</p>
+<h1 style="font-size:20px;margin:0 0 4px">{escape(config.REPORT_NAME.upper())}: week ending {today.strftime('%A %d %B %Y')}</h1>
+<p style="color:#666;margin:0 0 12px">Weekly report{' with the monthly sweep' if mode == 'monthly' else ''}. Ages 5-9, South Africa.</p>
 <p style="font-size:16px;background:#f4f4f4;padding:10px 12px;border-left:4px solid #222">{escape(report.headline)}</p>"""]
 
     parts.append(_h2("Act now (score 75+)"))
@@ -78,20 +78,20 @@ def html(report: Report, scored: list[Scored], today: date, mode: str,
         parts.append(_h2("Prepare (55-74): get quotes, line up a test lab"))
         parts.append("".join(_trend_card(s) for s in prep))
 
-    parts.append(_h2(f"Rising (new or up more than {config.RISING_THRESHOLD} points)"))
+    parts.append(_h2(f"Rising (new or up more than {config.RISING_THRESHOLD} points since last week)"))
     rows = rising(scored)
     parts.append("<ul>" + "".join(
         f"<li><strong>{escape(s.trend.name)}</strong> {_badge(s.band)} {s.score} ({_fmt_delta(s.since_last)}): "
         f"{escape(s.trend.why_now)}" + (f" Source: {_link(s.trend.evidence[0].source, s.trend.evidence[0].url)}" if s.trend.evidence else "")
-        + "</li>" for s in rows) + "</ul>" if rows else "<p>No new or fast-rising trends today.</p>")
+        + "</li>" for s in rows) + "</ul>" if rows else "<p>No new or fast-rising trends this week.</p>")
 
     parts.append(_h2("Watchlist movement"))
     th = 'style="text-align:left;padding:4px 6px;background:#f4f4f4;font-size:12px"'
     td = 'style="padding:4px 6px;border-top:1px solid #eee;font-size:12px;vertical-align:top"'
-    head = "".join(f"<th {th}>{h}</th>" for h in ["Trend", "Band", "Score", "7-day", "TikTok", "Google Trends", "Amazon", "Takealot"])
+    head = "".join(f"<th {th}>{h}</th>" for h in ["Trend", "Band", "Score", "4-week", "TikTok", "Google Trends", "Amazon", "Takealot"])
     body = "".join(
         f"<tr><td {td}>{escape(s.trend.name)}{'' if s.trend.seen_today else STALE}</td>"
-        f"<td {td}>{_badge(s.band)}</td><td {td}><strong>{s.score}</strong></td><td {td}>{_fmt_delta(s.change_7d, 'n/a')}</td>"
+        f"<td {td}>{_badge(s.band)}</td><td {td}><strong>{s.score}</strong></td><td {td}>{_fmt_delta(s.change_4w, 'n/a')}</td>"
         f"<td {td}>{escape(s.trend.tiktok_change)}</td><td {td}>{escape(s.trend.google_trends_change)}</td>"
         f"<td {td}>{escape(s.trend.amazon_rank_change)}</td><td {td}>{escape(s.trend.takealot_status)}</td></tr>"
         for s in scored)
@@ -100,11 +100,11 @@ def html(report: Report, scored: list[Scored], today: date, mode: str,
     parts.append(_h2("Licensing and entertainment pipeline"))
     parts.append("<ul>" + "".join(
         f"<li><strong>{_link(p.item, p.url)}</strong> ({escape(p.date)}): {escape(p.note)}</li>"
-        for p in report.licensing_pipeline) + "</ul>" if report.licensing_pipeline else "<p>No new deals or releases found today.</p>")
+        for p in report.licensing_pipeline) + "</ul>" if report.licensing_pipeline else "<p>No new deals or releases found this week.</p>")
 
     parts.append(_h2("SA market pulse"))
     parts.append("<ul>" + "".join(f"<li>{escape(x)}</li>" for x in report.sa_market_pulse) + "</ul>"
-                 if report.sa_market_pulse else "<p>No SA movements found today.</p>")
+                 if report.sa_market_pulse else "<p>No SA movements found this week.</p>")
 
     parts.append(_h2("Risk alerts"))
     risk = [f"<li>{_link(a.alert, a.url)}</li>" for a in report.risk_alerts]
@@ -126,7 +126,7 @@ def html(report: Report, scored: list[Scored], today: date, mode: str,
 Keep a human review step for anything at ACT.</p>
 <p><strong>Feeds working:</strong> {escape(', '.join(ok)) or 'none'}<br>
 <strong>Feeds failing:</strong> {escape(', '.join(bad)) or 'none'}</p>
-{'<p><strong>Not checked today:</strong></p><ul>' + gaps + '</ul>' if gaps else ''}
+{'<p><strong>Not checked this week:</strong></p><ul>' + gaps + '</ul>' if gaps else ''}
 </div></div>""")
     return "\n".join(parts)
 

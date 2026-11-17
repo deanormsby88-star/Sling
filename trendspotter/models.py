@@ -30,7 +30,7 @@ class Trend(BaseModel):
     aliases: list[str]
     ip_status: Literal["generic", "licensed", "proprietary"]
     scores: FactorScores
-    evidence: list[Evidence] = Field(description="Strongest signals today, up to 4")
+    evidence: list[Evidence] = Field(description="Strongest signals this week, up to 5")
     why_now: str = Field(description="One sentence")
     age_fit_note: str = Field(description="Why this is (or is not) a 5-9 trend rather than kidult or toddler")
     sourcing_route: str = Field(description="e.g. 'generic: 1688 factories, SANS 8124 test report needed' or 'licensed distributor only'")
@@ -43,7 +43,7 @@ class Trend(BaseModel):
     takealot_status: str = Field(description="e.g. 'not listed', 'listed R199', 'top 20 bestseller', or 'n/a'")
     safety_recall_active: bool = Field(description="True if there is an active recall or safety warning for this product type")
     only_ip_lookalikes_sourceable: bool = Field(description="True if the only sourceable product would be an IP lookalike or counterfeit")
-    seen_today: bool = Field(description="True if you found a fresh signal today; False if carried over from the watchlist without new data")
+    seen_today: bool = Field(description="True if you found a fresh signal this week; False if carried over from the watchlist without new data")
 
 
 class PipelineItem(BaseModel):
@@ -59,9 +59,9 @@ class Alert(BaseModel):
 
 
 class Report(BaseModel):
-    headline: str = Field(description="1-2 lines: the single most important change since the last report")
+    headline: str = Field(description="1-2 lines: the single most important change since last week's report")
     trends: list[Trend] = Field(description="Every watchlist item plus new candidates")
     licensing_pipeline: list[PipelineItem] = Field(description="New deals and releases in the next 3-12 months")
     sa_market_pulse: list[str] = Field(description="Takealot / Toys R Us SA / PEP movements, local press, Durban freight/port status, ZAR exchange rate")
     risk_alerts: list[Alert] = Field(description="Recalls, safety warnings, counterfeit crackdowns, fads in decline")
-    data_gaps: list[str] = Field(description="Sources you could not check today and why")
+    data_gaps: list[str] = Field(description="Sources you could not check this week and why")
