@@ -2,23 +2,17 @@
 
 Everything here comes from the research brief "Just Imagine Trendspotter: Daily
 Source Map for Ages 5-9 Toy Trends (South Africa)". Edit this file to change the
-watchlist, feeds, keywords, weights or calendar. No code changes needed.
+watchlist, sources, weights or calendar. The weekly run reads it each Friday.
 """
-
-import os
 
 REPORT_NAME = "Just Imagine Trendspotter"
 
-# Claude model and spend controls. Override with environment variables.
-MODEL = os.environ.get("TRENDSPOTTER_MODEL", "claude-opus-5-5")
-EFFORT = os.environ.get("TRENDSPOTTER_EFFORT", "high")  # low | medium | high | xhigh
-# One deep run a week (Friday). The first Friday of the month adds the monthly sources.
-MAX_WEB_SEARCHES = {"daily": 20, "weekly": 45, "monthly": 55}
-MAX_WEB_FETCHES = {"daily": 10, "weekly": 25, "monthly": 30}
+# The weekly run (Friday) covers Tier 1 and Tier 2 sources in one pass.
+# The first Friday of each month also covers the monthly sources.
 MAX_NEW_CANDIDATES = 10
 
 # ---------------------------------------------------------------------------
-# Seed watchlist. The agent re-scores these every day and adds new candidates.
+# Seed watchlist. The weekly run re-scores these and adds new candidates.
 # ip: "generic" (sourceable from factories), "licensed" (only via licence or
 # licensed distributor), "proprietary" (no legitimate route; lookalikes = red flag)
 # ---------------------------------------------------------------------------
@@ -41,60 +35,26 @@ SEED_WATCHLIST = [
 
 TIKTOK_HASHTAGS = ["#toytok", "#toyreview", "#unboxing", "#squishy", "#blindbox", "#fidget"]
 
-# ---------------------------------------------------------------------------
-# Tier 1 collectors (free, automated). Dead feeds show up in the email footer.
-# ---------------------------------------------------------------------------
-TRADE_FEEDS = {
-    "The Toy Book": "https://www.toybook.com/feed",
-    "Toy World": "https://toyworldmag.co.uk/feed/",
-    "Toy News": "https://www.toynews-online.biz/feed",
-    "License Global": "https://www.licenseglobal.com/rss.xml",
-    "Kidscreen": "https://kidscreen.com/feed/",
-    "Toys n Playthings": "https://www.toysnplaythings.com/feed",
-}
-
-# Google News RSS searches: a cheap, reliable way to catch press coverage.
-NEWS_QUERIES = {
-    "SA toys": ("toys South Africa", "en-ZA", "ZA"),
-    "Toy trends": ("toy trend viral kids", "en-US", "US"),
-    "Toy licensing": ('"master toy licensee" OR "toy license"', "en-US", "US"),
-    "Toy shortages": ('toy "sold out" OR shortage kids', "en-GB", "GB"),
-    "Toy recalls": ("toy recall children", "en-GB", "GB"),
-    "Durban port": ("Durban port congestion", "en-ZA", "ZA"),
-}
-
-# Reddit (public JSON). Weekly sweep also covers safety complaints.
-SUBREDDITS = ["toys", "Parenting", "Mommit", "daddit", "needoh"]
-
-# YouTube channel RSS. Add channel IDs (the UC... part of a channel URL) for the
-# ~30 kids' toy channels you want followed. Leave empty to rely on web search.
-YOUTUBE_CHANNELS: dict[str, str] = {}
-
-# Headline keyword triggers from the brief.
-KEYWORD_TRIGGERS = ["master toy licen", "sold out", "shortage", "recall", "viral", "waiting list", "restock"]
-
-# Safety and recall feeds (weekly).
-SAFETY_FEEDS = {
-    "US CPSC recalls": "https://www.cpsc.gov/Newsroom/CPSC-RSS-Feed/Recalls-RSS",
-}
+# Trigger words to search trade news for.
+KEYWORD_TRIGGERS = ["master toy licensee", "sold out", "shortage", "recall", "viral", "waiting list", "restock"]
 
 # ---------------------------------------------------------------------------
-# Sources Claude checks itself with web search / fetch, by cadence.
+# Sources to research each week, by cadence.
 # ---------------------------------------------------------------------------
 WEB_SOURCES = {
-    "daily": [
+    "weekly": [
         "TikTok Creative Center trending hashtags (US, GB, ZA) and the toy hashtags " + ", ".join(TIKTOK_HASHTAGS),
         "Google Trends rising queries in Toys for ZA, US and GB, plus each watchlist item",
-        "Amazon US and UK Toys & Games Movers & Shakers and Hot New Releases (and Amazon.co.za); flag new entrants and rank jumps above 500%",
-        "Takealot toy best sellers and 'What's Hot'; record new entrants and price points",
+        "Amazon US and UK Toys & Games Movers & Shakers and Hot New Releases (and Amazon.co.za); new entrants and rank jumps above 500%",
+        "Takealot toy best sellers and 'What's Hot'; new entrants and price points",
         "YouTube kids' toy review, unboxing and 'hunting' channels: top new uploads and the products named",
-    ],
-    "weekly": [
+        "Trade news: The Toy Book, Toy World, Toy News, License Global, Kidscreen, Toys n Playthings; search for: " + ", ".join(KEYWORD_TRIGGERS),
         "Walmart, Target, Smyths, Argos and Hamleys bestsellers; Toys R Us SA, Toy Kingdom, PEP/Ackermans new-in pages",
         "Temu, AliExpress and 1688 for each watchlist item: number of copies, price floor, MOQ",
-        "Reddit and parent communities: 'where can I find X?', school fads, safety complaints",
+        "Reddit (r/toys, r/Parenting, r/Mommit, r/daddit, r/needoh) and parent communities: 'where can I find X?', school fads, safety complaints",
         "Safety and recall sweep: US CPSC, UK OPSS / Trading Standards, EU Safety Gate",
         "Netflix Top 10 (kids), Disney+ and cinema release slate for the next 12 months; licensing deal round-up",
+        "SA market: Durban port and China-SA freight rates, ZAR exchange rate, SA toy retail news",
     ],
     "monthly": [
         "Circana releases (US, UK, G12) and Toy Association industry reports",
@@ -105,7 +65,7 @@ WEB_SOURCES = {
 }
 
 # ---------------------------------------------------------------------------
-# Scoring framework (weights total 100). Each factor is scored 0-5 by Claude.
+# Scoring framework (weights total 100). Each factor is scored 0-5.
 # ---------------------------------------------------------------------------
 WEIGHTS = {
     "velocity": 20,
@@ -115,6 +75,15 @@ WEIGHTS = {
     "runway": 10,
     "margin": 10,
     "longevity": 10,
+}
+FACTOR_LABELS = {
+    "velocity": "Velocity",
+    "cross_platform": "Cross-platform",
+    "age_fit": "5-9 fit",
+    "sourcing": "Sourcing and IP",
+    "runway": "SA runway",
+    "margin": "Margin",
+    "longevity": "Longevity",
 }
 BANDS = [(75, "ACT"), (55, "PREPARE"), (35, "WATCH"), (0, "IGNORE")]
 MIN_MONTHS_TO_SA_PEAK_FOR_ACT = 4  # import runway rule: 10-16 weeks
