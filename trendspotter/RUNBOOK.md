@@ -19,9 +19,12 @@ python -m pip install -q -r requirements.txt   # python -m pip, so packages go t
 mkdir -p out
 ```
 
+The code runs on Python 3.10 or later. Always call it as `python`: a bare `pip` can belong to a different Python.
+
 Read the report page with the Artifact tool (`action: "read"`, `url` above). The result normally names the local
-file that holds the full page: copy it to `out/previous.html`. If the result gives the page inline instead, write
-it to `out/previous.html` yourself. Either way, check the history block arrived, because without it the history
+file that holds the full page: copy it to `out/previous.html`. If it names no file and gives the page inline instead,
+write the `<script type="application/json" id="trendspotter-state">...</script>` block to `out/previous.html`,
+copied character for character; nothing else from the page is needed. Either way, check the history block arrived, because without it the history
 resets:
 
 ```bash
@@ -40,7 +43,9 @@ This prints the sources to check, the watchlist with last week's scores, and the
 
 Use web search and web fetch to work through every source in the brief. Do the searches in parallel batches.
 Some sites refuse automated page reads. If a site fails twice, stop fetching it, rely on search results for it,
-and record the gap in `data_gaps`.
+and record the gap in `data_gaps`. If page reads fail because a host does not resolve or is not allowed, the
+session's network policy is blocking them: stop trying further sites, carry on with web search alone, and say so
+in `data_gaps` and the final summary so the network setting can be changed.
 Aim for about 30 to 45 searches plus page reads where a page holds the numbers. Spend the effort where it
 changes a decision: confirm promising trends on more platforms, rather than re-checking flat ones.
 
