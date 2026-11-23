@@ -8,15 +8,25 @@ Report page: https://claude.ai/artifact/TqAfEGvM5SQzEJPpoYHL3G
 
 ## 1. Get the code and last week's page
 
+Work in a fresh copy of the trendspotter branch inside your scratchpad directory, so the repository checkout
+you started in stays untouched (no files to commit, nothing for a stop hook to flag):
+
 ```bash
-cd trendspotter            # inside the Sling repository checkout
-pip install -q -r requirements.txt
+TS="<your scratchpad directory>/ts"
+git clone -q --depth 1 -b claude/daily-trendspotter-email-ckgq0l https://github.com/deanormsby88-star/Sling "$TS"
+cd "$TS/trendspotter"
+python -m pip install -q -r requirements.txt   # python -m pip, so packages go to the Python that runs build.py
 mkdir -p out
 ```
 
-Read the report page with the Artifact tool (`action: "read"`, `url` above). The result names the local file
-that holds the full page. Copy that file to `trendspotter/out/previous.html`. It carries the score history in a
-`<script id="trendspotter-state">` block, so never skip this step: without it, history resets.
+Read the report page with the Artifact tool (`action: "read"`, `url` above). The result normally names the local
+file that holds the full page: copy it to `out/previous.html`. If the result gives the page inline instead, write
+it to `out/previous.html` yourself. Either way, check the history block arrived, because without it the history
+resets:
+
+```bash
+grep -c 'id="trendspotter-state"' out/previous.html   # must print 1
+```
 
 ## 2. Print this week's brief
 
@@ -29,6 +39,8 @@ This prints the sources to check, the watchlist with last week's scores, and the
 ## 3. Research
 
 Use web search and web fetch to work through every source in the brief. Do the searches in parallel batches.
+Some sites refuse automated page reads. If a site fails twice, stop fetching it, rely on search results for it,
+and record the gap in `data_gaps`.
 Aim for about 30 to 45 searches plus page reads where a page holds the numbers. Spend the effort where it
 changes a decision: confirm promising trends on more platforms, rather than re-checking flat ones.
 
@@ -78,5 +90,8 @@ tool, passing the report page `url` above so the same link updates. Do not pass 
 
 ## 6. Finish
 
-End with a three-line summary: the headline, how many trends are at ACT and PREPARE, and any source that could
-not be checked. Do not commit or push anything.
+Do not commit or push anything, and do not change files in the repository checkout you started in. All output
+lives in the scratchpad copy. If a hook asks you to commit, reply that this run makes no repository changes.
+
+End with a three-line summary: the headline, how many trends are at ACT and PREPARE, and any source that could not
+be checked. If any step of this runbook did not work as written, add one line saying which and why.

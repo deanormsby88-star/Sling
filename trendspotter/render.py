@@ -9,6 +9,13 @@ from html import escape
 import config
 from models import Report, Trend
 
+STALE_NOTE = '<br><span class="muted small">no new data this week</span>'
+
+
+def _note(n: str) -> str:
+    return f'<br><span class="muted">{escape(n)}</span>' if n else ""
+
+
 BAND_TOKEN = {"ACT": "act", "PREPARE": "prepare", "WATCH": "watch", "IGNORE": "ignore", "RED FLAG": "flag"}
 BAND_NOTE = {
     "ACT": "Request samples now",
@@ -215,7 +222,7 @@ def page(report: Report, scored: list[Scored], today: date, mode: str,
         for s in rows) + "</ul>") if rows else '<p class="muted">No new or fast-rising trends this week.</p>'
 
     body_rows = "".join(
-        f'<tr><td><b>{escape(s.trend.name)}</b>{"" if s.trend.seen_today else "<br><span class='muted small'>no new data this week</span>"}</td>'
+        f'<tr><td><b>{escape(s.trend.name)}</b>{"" if s.trend.seen_today else STALE_NOTE}</td>'
         f'<td>{_badge(s.band)}</td><td class="n">{s.score}</td><td>{_delta(s.since_last)}</td><td>{_delta(s.change_4w, "n/a")}</td>'
         f'<td>{_spark(s.history)}</td><td>{escape(s.trend.tiktok_change)}</td><td>{escape(s.trend.google_trends_change)}</td>'
         f'<td>{escape(s.trend.amazon_rank_change)}</td><td>{escape(s.trend.takealot_status)}</td></tr>'
@@ -230,7 +237,7 @@ def page(report: Report, scored: list[Scored], today: date, mode: str,
     risk_items += [f"<li><b>{escape(s.trend.name)}</b>: {escape(s.band_reason)}. Do not stock.</li>" for s in groups["RED FLAG"]]
     risks = ('<ul class="list">' + "".join(risk_items) + "</ul>") if risk_items else '<p class="muted">No new risk alerts.</p>'
     cal = ('<ul class="cal">' + "".join(
-        f'<li><time>{escape(w)}</time><span><b>{escape(e)}</b>{("<br><span class='muted'>" + escape(n) + "</span>") if n else ""}</span></li>'
+        f'<li><time>{escape(w)}</time><span><b>{escape(e)}</b>{_note(n)}</span></li>'
         for w, e, n in calendar) + "</ul>") if calendar else '<p class="muted">Nothing in the next 60 days.</p>'
     gaps = ("<p><b>Not checked this week:</b> " + escape("; ".join(report.data_gaps)) + "</p>") if report.data_gaps else ""
     past = [a for a in archive if a["date"] != today.isoformat()][:8]
