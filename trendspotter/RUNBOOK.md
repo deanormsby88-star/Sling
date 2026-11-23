@@ -43,9 +43,9 @@ This prints the sources to check, the watchlist with last week's scores, and the
 
 Use web search and web fetch to work through every source in the brief. Do the searches in parallel batches.
 Some sites refuse automated page reads. If a site fails twice, stop fetching it, rely on search results for it,
-and record the gap in `data_gaps`. If page reads fail because a host does not resolve or is not allowed, the
-session's network policy is blocking them: stop trying further sites, carry on with web search alone, and say so
-in `data_gaps` and the final summary so the network setting can be changed.
+and record the gap in `data_gaps`. The environment's network access is unrestricted, so a failed read means the
+site refused an automated reader (common for Amazon, TikTok, Takealot and Google Trends). No setting fixes that;
+do not suggest changing network settings.
 Aim for about 30 to 45 searches plus page reads where a page holds the numbers. Spend the effort where it
 changes a decision: confirm promising trends on more platforms, rather than re-checking flat ones.
 
