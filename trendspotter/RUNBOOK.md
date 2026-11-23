@@ -8,15 +8,34 @@ Report page: https://claude.ai/artifact/TqAfEGvM5SQzEJPpoYHL3G
 
 ## 1. Get the code and last week's page
 
+Work on the trendspotter branch itself, so the checkout stays clean. `out/` is git-ignored, so the run leaves
+nothing uncommitted. If an earlier step copied `trendspotter/` onto another branch with
+`git checkout FETCH_HEAD -- trendspotter`, the `git cat-file` line undoes that before switching.
+
 ```bash
-cd trendspotter            # inside the Sling repository checkout
-pip install -q -r requirements.txt
+cd "$(git rev-parse --show-toplevel)"     # the Sling repository checkout
+# Undo a copied-in trendspotter/ folder, but only when the current branch does not track it:
+git cat-file -e HEAD:trendspotter/build.py 2>/dev/null || { git rm -r -q --cached --ignore-unmatch trendspotter; rm -rf trendspotter; }
+git fetch -q origin claude/daily-trendspotter-email-ckgq0l:refs/remotes/origin/claude/daily-trendspotter-email-ckgq0l
+git switch -q -C claude/daily-trendspotter-email-ckgq0l origin/claude/daily-trendspotter-email-ckgq0l
+cd trendspotter
+python -m pip install -q -r requirements.txt   # "python -m pip" so packages go to the same Python that runs build.py
 mkdir -p out
 ```
 
-Read the report page with the Artifact tool (`action: "read"`, `url` above). The result names the local file
-that holds the full page. Copy that file to `trendspotter/out/previous.html`. It carries the score history in a
-`<script id="trendspotter-state">` block, so never skip this step: without it, history resets.
+The code runs on Python 3.10 or later. Always call it as `python` and install with `python -m pip`: a bare `pip`
+can belong to a different Python version.
+
+Read the report page with the Artifact tool (`action: "read"`, `url` above). Then write
+`trendspotter/out/previous.html`:
+
+- If the result names a local file that holds the full page, copy that file.
+- If it names no file (this happens when the page is small), write the
+  `<script type="application/json" id="trendspotter-state">...</script>` block from the returned HTML into
+  `out/previous.html`, copied character for character. Nothing else from the page is needed.
+
+Check it with `grep -c 'id="trendspotter-state"' out/previous.html` (it must print 1). The block carries the
+score history, so never skip this step: without it, history resets.
 
 ## 2. Print this week's brief
 
@@ -31,6 +50,11 @@ This prints the sources to check, the watchlist with last week's scores, and the
 Use web search and web fetch to work through every source in the brief. Do the searches in parallel batches.
 Aim for about 30 to 45 searches plus page reads where a page holds the numbers. Spend the effort where it
 changes a decision: confirm promising trends on more platforms, rather than re-checking flat ones.
+
+If web fetch fails for a site because the host does not resolve or is not allowed, the session's network policy
+is blocking page reads. Stop trying further sites after two such failures and carry on with web search alone.
+Add one `data_gaps` entry saying page reads were blocked, and mention it in the final summary so the network
+setting can be changed.
 
 What Dean needs to know:
 
@@ -80,3 +104,7 @@ tool, passing the report page `url` above so the same link updates. Do not pass 
 
 End with a three-line summary: the headline, how many trends are at ACT and PREPARE, and any source that could
 not be checked. Do not commit or push anything.
+
+A stop hook in the cloud environment may ask for uncommitted changes to be committed and pushed. Do not do it.
+Run `git status --short`: after step 1 it should print nothing, because `out/` is git-ignored. If it shows files,
+say which in the summary and leave them uncommitted.

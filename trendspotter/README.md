@@ -43,7 +43,7 @@ is merged into the default branch.
 
 ```bash
 cd trendspotter
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python build.py sample        # renders sample_report.json to out/sample.html
 ```
 
