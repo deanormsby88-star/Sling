@@ -2,7 +2,7 @@
 
 The Friday session reads the emails and writes one record per trading day to a JSON file:
   [{"date": "2026-11-24", "toys": {"Squishy dumplings": 19}, "lp_boys": 6, "lp_girls": 4}, ...]
-(toys = "Daily sales of the current toy", one entry per toy named; lp = "Daily sales of the
+(toys = "Daily sales of the current toy" in cases, one entry per toy named; lp = "Daily sales of the
 current L/P" in cases.) This script does the maths so it is the same every week:
 
   python sales.py --records out/sales.json --end 2026-11-26
@@ -87,7 +87,7 @@ def html(s: dict) -> str:
     promo_now = ", ".join(w["promotion"]) or "none recorded"
     promo_prev = ", ".join(wp["promotion"]) or "none recorded"
     return f"""<table>
-<tr><th></th><th>Toy sales (units)</th><th>Lucky packets (cases)</th></tr>
+<tr><th></th><th>Toy sales (cases)</th><th>Lucky packets (cases)</th></tr>
 {row("This week", w, wp)}
 {row("Month to date", m, mp)}
 </table>

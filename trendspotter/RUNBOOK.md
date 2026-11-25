@@ -118,7 +118,7 @@ or `--ji-logo` to override. Check the PDF text before sending it to Dean.
 ## Weekly sales block (Friday Wimpy email)
 
 Shamain's daily "Stock & Sales for DD.MM.YYYY" emails (from admin@justimagineconsulting.co.za) give, per trading
-day, units of each current promotional toy and lucky packet cases (boys + girls). Write one record per day to
+day, cases of each current promotional toy and lucky packet cases (boys + girls). Write one record per day to
 `out/sales.json` and run `python sales.py --records out/sales.json --end <last day>`; it prints the totals and writes
 `out/sales.html` for the email. Dating rules: "for today" means the day the email was sent; "for yesterday" means
 the previous trading day; a "Re:" or "Fw:" subject can carry an old date, so trust the body and the sent date. If
