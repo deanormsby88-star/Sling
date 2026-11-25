@@ -17,6 +17,7 @@ Two steps, run by the weekly scheduled Claude session (see RUNBOOK.md):
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -111,7 +112,11 @@ def client_pdf(args) -> int:
     out = Path(args.out if args.out != str(HERE / "out" / "trendspotter.html") else HERE / "out" / f"client-report-{when}.pdf")
     out.parent.mkdir(parents=True, exist_ok=True)
     html_path = out.with_suffix(".html")
-    html_path.write_text(client.html(report, when, args.client_name, args.client_logo, args.ji_logo))
+    images = {}
+    if args.images and Path(args.images).exists():
+        images = {k: {**v, "file": str((HERE / v["file"]) if not Path(v["file"]).is_absolute() else v["file"])}
+                  for k, v in json.loads(Path(args.images).read_text()).items()}
+    html_path.write_text(client.html(report, when, args.client_name, args.client_logo, args.ji_logo, images))
     footer = f"Just Imagine Consulting · Prepared for {args.client_name} · Confidential"
     subprocess.run(["node", str(HERE / "pdf.js"), str(html_path), str(out), footer], check=True)
     print(f"Wrote {out}")
@@ -127,6 +132,7 @@ def main() -> int:
     ap.add_argument("--date", help="report date YYYY-MM-DD (default: today in SAST)")
     ap.add_argument("--client-name", default=config.CLIENT_NAME, help="client-pdf: the client's name")
     ap.add_argument("--client-logo", default=str(HERE / config.CLIENT_LOGO), help="client-pdf: client logo (PNG, JPG or SVG)")
+    ap.add_argument("--images", help="client-pdf: JSON of chosen product photos (see images.py)")
     ap.add_argument("--ji-logo", default=str(HERE / config.JI_LOGO), help="client-pdf: Just Imagine logo")
     args = ap.parse_args()
 

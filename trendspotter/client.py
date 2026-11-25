@@ -140,6 +140,9 @@ h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance }
 section { margin-top: 8mm }
 h2 { font-size: 14pt; font-weight: 900; text-transform: uppercase; letter-spacing: .02em; display: flex; align-items: center; margin-bottom: 4mm }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm }
+figure { margin: -4mm -4.5mm 1mm; background: var(--mist); border-radius: 2mm 2mm 0 0; overflow: hidden }
+figure img { display: block; width: 100%; height: 42mm; object-fit: contain; background: var(--paper) }
+figcaption { font-size: 6.5pt; color: var(--muted); padding: 1mm 4.5mm; text-align: right }
 .card { border: .35mm solid var(--line); border-radius: 2mm; padding: 4mm 4.5mm; break-inside: avoid; display: grid; gap: 2mm; align-content: start }
 .card-head { display: flex; justify-content: space-between; gap: 3mm; align-items: start }
 .card h3 { font-size: 11.5pt; font-weight: 800; line-height: 1.2 }
@@ -165,7 +168,9 @@ tr { break-inside: avoid }
 """
 
 
-def html(report: Report, today: date, client_name: str, client_logo: str | None, ji_logo: str) -> str:
+def html(report: Report, today: date, client_name: str, client_logo: str | None, ji_logo: str,
+         images: dict | None = None) -> str:
+    images = images or {}
     trends = client_trends(report)
     top = [x for x in trends if x[3] in ("hot", "rising")][:6]
     rest = [x for x in trends if x not in top]
@@ -177,7 +182,13 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
         why, fit = _clean(t.why_now), _clean(t.age_fit_note)
         if fit and why and fit.split()[:2] == why.split()[:2]:
             fit = ""  # avoid repeating the same point
+        pic = images.get(t.name)
+        fig = ""
+        if pic and Path(pic["file"]).exists():
+            fig = (f'<figure><img src="{_data_uri(pic["file"])}" alt="{escape(t.name)}">'
+                   f'<figcaption>Image: {escape(pic.get("credit", ""))}</figcaption></figure>')
         return f"""<article class="card">
+  {fig}
   <div class="card-head"><h3>{escape(t.name)}</h3><span class="chip {cls}">{name}</span></div>
   <div class="meter">{_blocks(v)} Trend strength {v}/100</div>
   {f'<p>{escape(why)}</p>' if why else ''}

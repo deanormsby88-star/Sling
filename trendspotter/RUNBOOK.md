@@ -123,3 +123,17 @@ day, cases of each current promotional toy and lucky packet cases (boys + girls)
 `out/sales.html` for the email. Dating rules: "for today" means the day the email was sent; "for yesterday" means
 the previous trading day; a "Re:" or "Fw:" subject can carry an old date, so trust the body and the sent date. If
 two emails cover the same day, keep the later one. List any weekdays with no email for Dean (not in the client email).
+
+## Product photos (client PDF)
+
+Dean chose shop and brand product photos for the trend cards (he accepted the copyright risk). Each photo is credited
+with its source site under the image. Steps:
+1. `python images.py candidates --previous out/previous.html` downloads the preview image of every evidence page.
+2. Look at them (e.g. `montage -label '%d/%f' out/candidates/*/*.jpg -tile 4x -geometry 280x210+6+18 out/contact.jpg`,
+   then view the sheet). Keep only a clear photo of the product itself: no people, screenshots, collages, logos or
+   licensed characters.
+3. For trends with nothing usable, web-search a specialist shop or brand product page for a typical example and run
+   `python images.py fetch --trend "<name>" --url <page>` (Walmart, Target, Amazon and most big shops block this;
+   Shopify-based shops such as toysmith.com usually work). Skip the photo if nothing suitable turns up.
+4. Write `out/images.json` ({"<trend name>": {"file": "...", "credit": "<site>"}}) and build with
+   `python build.py client-pdf --previous out/previous.html --images out/images.json`.
