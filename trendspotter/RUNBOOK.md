@@ -114,3 +114,12 @@ full report data; for older pages pass `--report <report.json>` instead. The PDF
 no red-flagged trends, risk alerts, recalls, sourcing, prices paid, margins, imports, testing, next steps,
 data gaps or SA market pulse (see `client.py`). The client name and both logos come from `config.py` and `brand/`; pass `--client-name`, `--client-logo`
 or `--ji-logo` to override. Check the PDF text before sending it to Dean.
+
+## Weekly sales block (Friday Wimpy email)
+
+Shamain's daily "Stock & Sales for DD.MM.YYYY" emails (from admin@justimagineconsulting.co.za) give, per trading
+day, units of each current promotional toy and lucky packet cases (boys + girls). Write one record per day to
+`out/sales.json` and run `python sales.py --records out/sales.json --end <last day>`; it prints the totals and writes
+`out/sales.html` for the email. Dating rules: "for today" means the day the email was sent; "for yesterday" means
+the previous trading day; a "Re:" or "Fw:" subject can carry an old date, so trust the body and the sent date. If
+two emails cover the same day, keep the later one. List any weekdays with no email for Dean (not in the client email).
