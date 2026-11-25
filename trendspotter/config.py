@@ -122,3 +122,38 @@ CALENDAR = [
     ((11, None), "Flag Easter lines (squishies, small collectibles)", ""),
     ((12, 25), "Christmas (SA summer: outdoor, water, ride-ons)", ""),
 ]
+
+# ---------------------------------------------------------------------------
+# Client PDF: fixed "Key dates" block. Update once a year.
+# Public holidays: Public Holidays Act (a Sunday holiday moves to Monday).
+# Public schools: gazetted DBE calendar (Government Gazette 52178).
+# Private schools (4 terms) and 3-term schools: ISASA/SAHISA Central Region guide,
+# updated Oct 2025. Individual independent schools may differ.
+# ---------------------------------------------------------------------------
+KEY_DATES_YEAR = 2027
+PUBLIC_HOLIDAYS = [
+    ("Fri 1 Jan", "New Year's Day"),
+    ("Mon 22 Mar", "Human Rights Day (21 Mar falls on a Sunday)"),
+    ("Fri 26 Mar", "Good Friday"),
+    ("Mon 29 Mar", "Family Day"),
+    ("Tue 27 Apr", "Freedom Day"),
+    ("Sat 1 May", "Workers' Day"),
+    ("Wed 16 Jun", "Youth Day"),
+    ("Mon 9 Aug", "National Women's Day"),
+    ("Fri 24 Sep", "Heritage Day"),
+    ("Thu 16 Dec", "Day of Reconciliation"),
+    ("Sat 25 Dec", "Christmas Day"),
+    ("Mon 27 Dec", "Day of Goodwill (26 Dec falls on a Sunday)"),
+]
+# (term, public schools, private schools, 3-term schools)
+SCHOOL_TERMS = [
+    ("Term 1", "13 Jan to 19 Mar", "13 Jan to 19 Mar", "13 Jan to 9 Apr"),
+    ("Term 2", "6 Apr to 25 Jun", "13 Apr to 25 Jun", "5 May to 6 Aug"),
+    ("Term 3", "20 Jul to 22 Sep", "20 Jul to 17 Sep", "8 Sep to 3 Dec"),
+    ("Term 4", "5 Oct to 8 Dec", "5 Oct to 1 Dec", "No fourth term"),
+]
+SCHOOL_HOLIDAYS = [
+    ("Public schools", "20 Mar to 5 Apr · 26 Jun to 19 Jul · 23 Sep to 4 Oct · from 9 Dec"),
+    ("Private schools", "20 Mar to 12 Apr · 26 Jun to 19 Jul · 18 Sep to 4 Oct · from 2 Dec"),
+    ("3-term schools", "10 Apr to 4 May · 7 Aug to 7 Sep · from 4 Dec"),
+]

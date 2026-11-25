@@ -43,7 +43,9 @@ is merged into the default branch.
 
 `python build.py client-pdf` turns the latest report into a branded PDF for a client, with only positive,
 client-safe content on generic products only (see `client.py` for exactly what is filtered out). The client's name and logos are set in
-`config.py` and `brand/`. Steps are in RUNBOOK.md.
+`config.py` and `brand/`. Steps are in RUNBOOK.md. The PDF's last page
+is a fixed "Key dates" block (SA public holidays and school terms for public, private and 3-term schools), set in
+`config.py`: update `KEY_DATES_YEAR`, `PUBLIC_HOLIDAYS`, `SCHOOL_TERMS` and `SCHOOL_HOLIDAYS` once a year.
 
 ## Local checks
 

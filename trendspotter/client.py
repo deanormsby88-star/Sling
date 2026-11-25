@@ -21,7 +21,7 @@ from datetime import date
 from html import escape
 from pathlib import Path
 
-import calendar_events
+import config
 import scoring
 from models import Report, Trend
 
@@ -54,7 +54,6 @@ LICENSED = re.compile(
     r"nintendo|beyblade|hot wheels|squishmallow|toy story|spider-?man|batman|gabby|cocomelon|sesame|fortnite",
     re.I,
 )
-INTERNAL_CALENDAR = re.compile(r"order|ship|freeze|flag|durban|stock|canton|congest|licens", re.I)
 
 
 def _clean(text: str) -> str:
@@ -159,8 +158,10 @@ th { text-align: left; font: 700 7pt var(--body); text-transform: uppercase; let
 td { padding: 2.2mm 2mm; border-bottom: .3mm solid var(--line); vertical-align: top }
 tr { break-inside: avoid }
 .list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm }
-.list li { display: grid; grid-template-columns: 26mm 1fr; gap: 3mm; break-inside: avoid }
+.list li { display: grid; grid-template-columns: 22mm 1fr; gap: 3mm; break-inside: avoid }
 .list time { font-weight: 800; color: var(--orange) }
+.keydates { break-before: page }
+.keydates h3 { font-size: 10pt; font-weight: 800; margin: 4mm 0 2mm }
 """
 
 
@@ -189,9 +190,10 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
         f"<tr><td><b>{escape(t.name)}</b></td><td><span class='chip {cls}'>{name}</span></td>"
         f"<td>{_blocks(v)}</td><td>{escape(_clean(t.why_now))}</td><td>{escape(_peak(t))}</td></tr>"
         for t, v, name, cls in rest)
-    # Only dates far enough ahead to plan and source for (4 to 12 months out).
-    cal = [(w, e) for w, e, _ in calendar_events.upcoming(today, days=365, start_days=120) if not INTERNAL_CALENDAR.search(e)]
-    cal_html = "".join(f"<li><time>{escape(w)}</time><span>{escape(e)}</span></li>" for w, e in cal)
+    hol_html = "".join(f"<li><time>{escape(d)}</time><span>{escape(n)}</span></li>" for d, n in config.PUBLIC_HOLIDAYS)
+    term_rows = "".join(f"<tr><td><b>{escape(t)}</b></td><td>{escape(a)}</td><td>{escape(b)}</td><td>{escape(c)}</td></tr>"
+                        for t, a, b, c in config.SCHOOL_TERMS)
+    hols_rows = "".join(f"<tr><td><b>{escape(k)}</b></td><td colspan='3'>{escape(v)}</td></tr>" for k, v in config.SCHOOL_HOLIDAYS)
     client_img = f'<img src="{_data_uri(client_logo)}" alt="{escape(client_name)}">' if client_logo else f"<b>{escape(client_name)}</b>"
     sq = '<span class="squares"><i></i><i></i><i></i></span>'
 
@@ -213,7 +215,15 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
 <table><thead><tr><th>Trend</th><th>Status</th><th>Strength</th><th>Why it's worth watching</th><th>SA peak</th></tr></thead>
 <tbody>{rows}</tbody></table></section>''' if rows else ''}
 
-{f'<section><h2>{sq}Key dates to plan for</h2><ul class="list">{cal_html}</ul></section>' if cal_html else ''}
+<section class="keydates"><h2>{sq}Key dates {config.KEY_DATES_YEAR}</h2>
+<h3>SA public holidays</h3>
+<ul class="list">{hol_html}</ul>
+<h3>School terms</h3>
+<table><thead><tr><th></th><th>Public schools</th><th>Private schools</th><th>3-term schools</th></tr></thead>
+<tbody>{term_rows}</tbody></table>
+<h3>School holidays</h3>
+<table><tbody>{hols_rows}</tbody></table>
+</section>
 
 
 </body></html>"""
