@@ -22,25 +22,26 @@ def easter(year: int) -> date:
     return date(year, month, day)
 
 
-def upcoming(today: date, days: int = 60) -> list[tuple[str, str, str]]:
-    """Return (when, event, note) for events in the next `days` days."""
+def upcoming(today: date, days: int = 60, start_days: int = 0) -> list[tuple[str, str, str]]:
+    """Return (when, event, note) for events from `start_days` to `days` days ahead."""
     end = today + timedelta(days=days)
+    start = today + timedelta(days=start_days)
     out: list[tuple[date, str, str, str]] = []
-    for year in (today.year, today.year + 1):
+    for year in (today.year, today.year + 1, today.year + 2):
         for (month, day), event, note in config.CALENDAR:
             if day:
                 d = date(year, month, day)
                 label = d.strftime("%d %b %Y")
-                in_range = today <= d <= end
+                in_range = start <= d <= end
             else:
                 d = date(year, month, 1)
                 label = d.strftime("%b %Y")
                 # Month-long items show while the month is current or starts in range.
-                in_range = (d.year, d.month) == (today.year, today.month) or today <= d <= end
+                in_range = (start_days == 0 and (d.year, d.month) == (today.year, today.month)) or start <= d <= end
             if in_range:
                 out.append((d, label, event, note))
         e = easter(year)
-        if today <= e <= end:
+        if start <= e <= end:
             out.append((e, e.strftime("%d %b %Y"), "Easter", "Squishies and small collectibles were 2026 Easter-basket hits."))
     out.sort(key=lambda x: x[0])
     return [(label, event, note) for _, label, event, note in out]

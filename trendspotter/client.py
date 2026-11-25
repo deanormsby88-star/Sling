@@ -54,7 +54,7 @@ LICENSED = re.compile(
     r"nintendo|beyblade|hot wheels|squishmallow|toy story|spider-?man|batman|gabby|cocomelon|sesame|fortnite",
     re.I,
 )
-INTERNAL_CALENDAR = re.compile(r"order|ship|freeze|flag|durban|stock|canton|congest", re.I)
+INTERNAL_CALENDAR = re.compile(r"order|ship|freeze|flag|durban|stock|canton|congest|licens", re.I)
 
 
 def _clean(text: str) -> str:
@@ -189,7 +189,8 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
         f"<tr><td><b>{escape(t.name)}</b></td><td><span class='chip {cls}'>{name}</span></td>"
         f"<td>{_blocks(v)}</td><td>{escape(_clean(t.why_now))}</td><td>{escape(_peak(t))}</td></tr>"
         for t, v, name, cls in rest)
-    cal = [(w, e) for w, e, _ in calendar_events.upcoming(today, days=90) if not INTERNAL_CALENDAR.search(e)]
+    # Only dates far enough ahead to plan and source for (4 to 12 months out).
+    cal = [(w, e) for w, e, _ in calendar_events.upcoming(today, days=365, start_days=120) if not INTERNAL_CALENDAR.search(e)]
     cal_html = "".join(f"<li><time>{escape(w)}</time><span>{escape(e)}</span></li>" for w, e in cal)
     client_img = f'<img src="{_data_uri(client_logo)}" alt="{escape(client_name)}">' if client_logo else f"<b>{escape(client_name)}</b>"
     sq = '<span class="squares"><i></i><i></i><i></i></span>'
@@ -212,7 +213,7 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
 <table><thead><tr><th>Trend</th><th>Status</th><th>Strength</th><th>Why it's worth watching</th><th>SA peak</th></tr></thead>
 <tbody>{rows}</tbody></table></section>''' if rows else ''}
 
-{f'<section><h2>{sq}Key dates</h2><ul class="list">{cal_html}</ul></section>' if cal_html else ''}
+{f'<section><h2>{sq}Key dates to plan for</h2><ul class="list">{cal_html}</ul></section>' if cal_html else ''}
 
 
 </body></html>"""
