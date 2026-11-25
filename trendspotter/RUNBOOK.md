@@ -111,7 +111,7 @@ python build.py client-pdf --previous out/previous.html \
 ```
 
 `out/previous.html` is the current report page, read as in step 1. Pages from 27 November 2026 onwards carry the
-full report data; for older pages pass `--report <report.json>` instead. The PDF holds only positive, client-safe
-material: no red-flagged trends, risk alerts, recalls, sourcing, prices paid, margins, imports, testing, next steps,
+full report data; for older pages pass `--report <report.json>` instead. The PDF holds only positive, client-safe material on generic products (no licensed properties):
+no red-flagged trends, risk alerts, recalls, sourcing, prices paid, margins, imports, testing, next steps,
 data gaps or SA market pulse (see `client.py`). Check the PDF text before sending it to Dean, and never store the
 client's name or logo in this repository, because it is public.

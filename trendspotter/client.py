@@ -1,8 +1,9 @@
 """Client-facing PDF of the weekly report, in Just Imagine Consulting's look.
 
 What goes in, and what stays out:
-- Only positive, forward-looking material: trends, why they fit ages 5-9, when they should
-  peak in South Africa, upcoming entertainment releases and key retail dates.
+- Only positive, forward-looking material about generic products: trends, why they fit
+  ages 5-9, when they should peak in South Africa, and key retail dates.
+- Licensed and proprietary properties (films, games, character brands) are left out.
 - Left out: red-flagged trends, risk alerts, recalls and safety notes, anything about
   sourcing, factories, prices paid, margins, imports, freight, quotes, samples or testing,
   the internal scores for sourcing, margin and runway, next steps, data gaps and the
@@ -38,13 +39,20 @@ NEGATIVE = re.compile(
     r"\bfall|\bdrop|crash|slump|\bdown\b|weak|delay|congest|shortage|restrict|red flag|\bfad\b|"
     r"lower than|slow|criticis|controvers|negative|problem|concern|dried out|mixed|clearance|matur|fading|\bfade|"
     r"peaked|no spike|no new|no fresh|no separate|quiet|flat\b|stall|cool(ing|ed)|saturat|discount|markdown|"
-    r"too close|too late|uncertain|unclear|not found|unknown",
+    r"too close|too late|uncertain|unclear|not found|unknown|\bno \d{4}\b|moving (away )?from|shift(ing|s)? away|moved on",
     re.I,
 )
 SENSITIVE = re.compile(
     r"factor(y|ies)|1688|alibaba|temu|aliexpress|\bmoq|supplier|sourc|import|\bduty|freight|quote|"
     r"sample|sans\b|sans 8124|\btest|nrcs|margin|landed|distributor|allocation|wholesale|\bstock|"
-    r"\border|just imagine|dean|our range|we should|request",
+    r"\border|just imagine|dean|our range|we should|request|trigger|licen[cs]",
+    re.I,
+)
+# Licensed or character brands: kept out so the report stays on generic products.
+LICENSED = re.compile(
+    r"barbie|care bears|disney|marvel|avengers|pok[eé]mon|bluey|stitch|minecraft|roblox|k-?pop|demon hunters|"
+    r"mrbeast|labubu|pop mart|sanrio|hello kitty|paw patrol|peppa|frozen|star wars|harry potter|sonic|mario|"
+    r"nintendo|beyblade|hot wheels|squishmallow|toy story|spider-?man|batman|gabby|cocomelon|sesame|fortnite",
     re.I,
 )
 INTERNAL_CALENDAR = re.compile(r"order|ship|freeze|flag|durban|stock|canton|congest", re.I)
@@ -55,13 +63,14 @@ def _clean(text: str) -> str:
     parts = re.split(r"(?<=[.;])\s+", (text or "").strip())
     # Keep the positive half of "X, but Y" sentences.
     parts = [re.split(r",?\s+but\s+|,?\s+although\s+|,?\s+though\s+|,?\s+however\b", p, maxsplit=1, flags=re.I)[0] for p in parts]
-    kept = [p for p in parts if p and not NEGATIVE.search(p) and not SENSITIVE.search(p)]
+    kept = [p for p in parts if p and not NEGATIVE.search(p) and not SENSITIVE.search(p) and not LICENSED.search(p)]
     out = " ".join(kept).strip()
+    out = out[:1].upper() + out[1:]
     return out.rstrip(";") + ("" if not out or out.endswith(".") else ".")
 
 
 def _ok(text: str) -> bool:
-    return bool(text) and not NEGATIVE.search(text) and not SENSITIVE.search(text)
+    return bool(text) and not NEGATIVE.search(text) and not SENSITIVE.search(text) and not LICENSED.search(text)
 
 
 def strength(t: Trend) -> int:
@@ -80,7 +89,7 @@ def label(value: int) -> tuple[str, str] | None:
 def client_trends(report: Report) -> list[tuple[Trend, int, str, str]]:
     out = []
     for t in report.trends:
-        if t.safety_recall_active or t.only_ip_lookalikes_sourceable or t.ip_status == "proprietary":
+        if t.safety_recall_active or t.only_ip_lookalikes_sourceable or t.ip_status != "generic" or LICENSED.search(t.name):
             continue
         if scoring.band(t, scoring.total_score(t))[0] == "RED FLAG":
             continue
@@ -122,7 +131,6 @@ h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance }
 .cover { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 8mm; padding-bottom: 6mm; border-bottom: 3px solid var(--ink) }
 .cover .ji { height: 26mm }
 .prepared { text-align: right; display: grid; gap: 2mm; justify-items: end }
-.prepared small { font: 600 7.5pt var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted) }
 .prepared img { height: 20mm }
 .title { margin: 8mm 0 3mm; display: grid; gap: 1mm }
 .title h1 { font-size: 34pt; line-height: .95; font-weight: 900; letter-spacing: -.01em; text-transform: uppercase }
@@ -131,11 +139,6 @@ h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance }
 .squares { display: inline-flex; gap: 1.6mm; vertical-align: middle; margin-right: 2.5mm }
 .squares i { width: 3.2mm; height: 3.2mm; border: .5mm solid var(--ink); border-radius: .6mm; display: block }
 .squares i:nth-child(1) { background: var(--red) } .squares i:nth-child(2) { background: var(--yellow) } .squares i:nth-child(3) { background: var(--orange) }
-.brief { display: grid; grid-template-columns: 1fr auto; gap: 8mm; align-items: center; background: var(--mist); border-left: 2mm solid var(--orange); padding: 5mm 6mm; margin: 5mm 0 2mm }
-.brief p { margin: 0; font-size: 11pt; line-height: 1.45; max-width: 120mm }
-.stats { display: flex; gap: 6mm }
-.stat { text-align: center } .stat b { display: block; font: 900 22pt/1 var(--display) }
-.stat span { font: 600 7pt var(--body); text-transform: uppercase; letter-spacing: .1em; color: var(--muted) }
 section { margin-top: 8mm }
 h2 { font-size: 14pt; font-weight: 900; text-transform: uppercase; letter-spacing: .02em; display: flex; align-items: center; margin-bottom: 4mm }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm }
@@ -156,11 +159,9 @@ table { width: 100%; border-collapse: collapse; font-size: 9pt }
 th { text-align: left; font: 700 7pt var(--body); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 2mm; border-bottom: .5mm solid var(--ink) }
 td { padding: 2.2mm 2mm; border-bottom: .3mm solid var(--line); vertical-align: top }
 tr { break-inside: avoid }
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm }
-.list { margin: 0; padding: 0; list-style: none; display: grid; gap: 2mm }
+.list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm }
 .list li { display: grid; grid-template-columns: 26mm 1fr; gap: 3mm; break-inside: avoid }
 .list time { font-weight: 800; color: var(--orange) }
-.method { margin-top: 8mm; padding-top: 3mm; border-top: .3mm solid var(--line); color: var(--muted); font-size: 7.8pt; max-width: 170mm }
 """
 
 
@@ -168,17 +169,14 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
     trends = client_trends(report)
     top = [x for x in trends if x[3] in ("hot", "rising")][:6]
     rest = [x for x in trends if x not in top]
-    n_hot = sum(1 for x in trends if x[3] == "hot")
-    n_rising = sum(1 for x in trends if x[3] == "rising")
 
-    headline = _clean(report.headline)
-    if not headline and top:
-        headline = f"{top[0][0].name} leads this week's trends for children aged 5 to 9."
 
     def card(t: Trend, v: int, name: str, cls: str) -> str:
         ev = [e for e in t.evidence if _ok(e.finding) and _ok(e.source)][:3]
         ev_html = "".join(f"<li><b>{escape(e.source)}:</b> {escape(e.finding)}</li>" for e in ev)
         why, fit = _clean(t.why_now), _clean(t.age_fit_note)
+        if fit and why and fit.split()[:2] == why.split()[:2]:
+            fit = ""  # avoid repeating the same point
         return f"""<article class="card">
   <div class="card-head"><h3>{escape(t.name)}</h3><span class="chip {cls}">{name}</span></div>
   <div class="meter">{_blocks(v)} Trend strength {v}/100</div>
@@ -192,8 +190,6 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
         f"<tr><td><b>{escape(t.name)}</b></td><td><span class='chip {cls}'>{name}</span></td>"
         f"<td>{_blocks(v)}</td><td>{escape(_clean(t.why_now))}</td><td>{escape(_peak(t))}</td></tr>"
         for t, v, name, cls in rest)
-    pipeline = [p for p in report.licensing_pipeline if _ok(p.item)]
-    pipe_html = "".join(f"<li><time>{escape(p.date)}</time><span>{escape(p.item)}</span></li>" for p in pipeline[:8])
     cal = [(w, e) for w, e, _ in calendar_events.upcoming(today, days=90) if not INTERNAL_CALENDAR.search(e)]
     cal_html = "".join(f"<li><time>{escape(w)}</time><span>{escape(e)}</span></li>" for w, e in cal)
     client_img = f'<img src="{_data_uri(client_logo)}" alt="{escape(client_name)}">' if client_logo else f"<b>{escape(client_name)}</b>"
@@ -203,19 +199,11 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
 <title>Kids' Toy Trends: {escape(client_name)} · {today.strftime('%d %B %Y')}</title><style>{CSS}</style></head><body>
 <header class="cover">
   <img class="ji" src="{_data_uri(ji_logo)}" alt="Just Imagine Consulting">
-  <div class="prepared"><small>Prepared for</small>{client_img}</div>
+  <div class="prepared">{client_img}</div>
 </header>
 <div class="title">
   <h1>Kids' toy <em>trends</em></h1>
   <p>Ages 5 to 9 · South Africa · Week ending {today.strftime('%d %B %Y')}</p>
-</div>
-<div class="brief">
-  <p>{escape(headline)}</p>
-  <div class="stats">
-    <div class="stat"><b>{n_hot}</b><span>Hot now</span></div>
-    <div class="stat"><b>{n_rising}</b><span>Rising</span></div>
-    <div class="stat"><b>{len(trends)}</b><span>Tracked</span></div>
-  </div>
 </div>
 
 <section><h2>{sq}Top trends this week</h2>
@@ -225,13 +213,7 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
 <table><thead><tr><th>Trend</th><th>Status</th><th>Strength</th><th>Why it's worth watching</th><th>SA peak</th></tr></thead>
 <tbody>{rows}</tbody></table></section>''' if rows else ''}
 
-<div class="two">
-{f'<section><h2>{sq}Coming up on screen</h2><ul class="list">{pipe_html}</ul></section>' if pipe_html else ''}
 {f'<section><h2>{sq}Key dates</h2><ul class="list">{cal_html}</ul></section>' if cal_html else ''}
-</div>
 
-<p class="method">How we track trends: each week we review social video, search interest, online bestseller charts,
-retailer lists and trade news across South Africa, the US and the UK. Trend strength combines momentum, how many
-independent channels confirm the trend, fit for children aged 5 to 9, and staying power. Expected SA peaks are
-estimates based on how trends have spread from the US and Asia to South Africa in the past.</p>
+
 </body></html>"""
