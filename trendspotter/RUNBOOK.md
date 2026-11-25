@@ -103,15 +103,14 @@ be checked. If any step of this runbook did not work as written, add one line sa
 
 ## Client PDF (only when Dean asks for it)
 
-Not part of the Friday run. When Dean asks for a client PDF in a session, he attaches his logo and the client's logo.
+Not part of the Friday run. When Dean asks for a client PDF, read the report page as in step 1, then run:
 
 ```bash
-python build.py client-pdf --previous out/previous.html \
-  --client-name "<client name>" --client-logo <client logo file> --ji-logo <Just Imagine logo file>
+python build.py client-pdf --previous out/previous.html
 ```
 
 `out/previous.html` is the current report page, read as in step 1. Pages from 27 November 2026 onwards carry the
 full report data; for older pages pass `--report <report.json>` instead. The PDF holds only positive, client-safe material on generic products (no licensed properties):
 no red-flagged trends, risk alerts, recalls, sourcing, prices paid, margins, imports, testing, next steps,
-data gaps or SA market pulse (see `client.py`). Check the PDF text before sending it to Dean, and never store the
-client's name or logo in this repository, because it is public.
+data gaps or SA market pulse (see `client.py`). The client name and both logos come from `config.py` and `brand/`; pass `--client-name`, `--client-logo`
+or `--ji-logo` to override. Check the PDF text before sending it to Dean.

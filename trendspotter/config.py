@@ -7,6 +7,11 @@ watchlist, sources, weights or calendar. The weekly run reads it each Friday.
 
 REPORT_NAME = "Just Imagine Trendspotter"
 
+# Client PDF defaults (build.py client-pdf). Logos live in brand/.
+CLIENT_NAME = "Wimpy"
+CLIENT_LOGO = "brand/client-logo.png"
+JI_LOGO = "brand/just-imagine-consulting.jpg"
+
 # The weekly run (Friday) covers Tier 1 and Tier 2 sources in one pass.
 # The first Friday of each month also covers the monthly sources.
 MAX_NEW_CANDIDATES = 10

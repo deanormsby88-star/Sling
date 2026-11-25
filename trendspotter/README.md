@@ -42,8 +42,8 @@ is merged into the default branch.
 ## Client PDF
 
 `python build.py client-pdf` turns the latest report into a branded PDF for a client, with only positive,
-client-safe content on generic products only (see `client.py` for exactly what is filtered out). The client's name and logo are passed in
-each time and are never stored in this public repository. Steps are in RUNBOOK.md.
+client-safe content on generic products only (see `client.py` for exactly what is filtered out). The client's name and logos are set in
+`config.py` and `brand/`. Steps are in RUNBOOK.md.
 
 ## Local checks
 

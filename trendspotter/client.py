@@ -9,8 +9,7 @@ What goes in, and what stays out:
   the internal scores for sourcing, margin and runway, next steps, data gaps and the
   SA market pulse (exchange rate, port delays).
 
-The client's name and logo are passed in at build time and never stored in this
-repository, which is public.
+The client's name and logo come from config.py and brand/ (Dean confirmed they are public).
 """
 
 from __future__ import annotations

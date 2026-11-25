@@ -125,9 +125,9 @@ def main() -> int:
     ap.add_argument("--report", help="this week's report JSON")
     ap.add_argument("--out", default=str(HERE / "out" / "trendspotter.html"))
     ap.add_argument("--date", help="report date YYYY-MM-DD (default: today in SAST)")
-    ap.add_argument("--client-name", help="client-pdf: the client's name, shown on the cover")
-    ap.add_argument("--client-logo", help="client-pdf: path to the client's logo (PNG, JPG or SVG)")
-    ap.add_argument("--ji-logo", default=str(HERE / "brand" / "just-imagine-consulting.jpg"), help="client-pdf: Just Imagine logo")
+    ap.add_argument("--client-name", default=config.CLIENT_NAME, help="client-pdf: the client's name")
+    ap.add_argument("--client-logo", default=str(HERE / config.CLIENT_LOGO), help="client-pdf: client logo (PNG, JPG or SVG)")
+    ap.add_argument("--ji-logo", default=str(HERE / config.JI_LOGO), help="client-pdf: Just Imagine logo")
     args = ap.parse_args()
 
     today = datetime.fromisoformat(args.date).date() if args.date else datetime.now(SAST).date()
