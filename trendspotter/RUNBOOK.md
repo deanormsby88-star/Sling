@@ -134,6 +134,7 @@ with its source site under the image. Steps:
    licensed characters.
 3. For trends with nothing usable, web-search a specialist shop or brand product page for a typical example and run
    `python images.py fetch --trend "<name>" --url <page>` (Walmart, Target, Amazon and most big shops block this;
-   Shopify-based shops such as toysmith.com usually work). Skip the photo if nothing suitable turns up.
+   Shopify-based shops such as toysmith.com, specialist toy shops and sensory shops usually work). Dean wants a photo
+   wherever possible, including the "Also on the radar" rows, so try several shop pages before giving up on a trend.
 4. Write `out/images.json` ({"<trend name>": {"file": "...", "credit": "<site>"}}) and build with
    `python build.py client-pdf --previous out/previous.html --images out/images.json`.

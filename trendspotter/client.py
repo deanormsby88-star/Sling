@@ -142,6 +142,8 @@ h2 { font-size: 14pt; font-weight: 900; text-transform: uppercase; letter-spacin
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm }
 figure { margin: -4mm -4.5mm 1mm; background: var(--mist); border-radius: 2mm 2mm 0 0; overflow: hidden }
 figure img { display: block; width: 100%; height: 42mm; object-fit: contain; background: var(--paper) }
+.thumb { display: block; width: 22mm; height: 16mm; object-fit: contain; background: var(--paper) }
+.credit { display: block; font-size: 5.5pt; color: var(--muted) }
 figcaption { font-size: 6.5pt; color: var(--muted); padding: 1mm 4.5mm; text-align: right }
 .card { border: .35mm solid var(--line); border-radius: 2mm; padding: 4mm 4.5mm; break-inside: avoid; display: grid; gap: 2mm; align-content: start }
 .card-head { display: flex; justify-content: space-between; gap: 3mm; align-items: start }
@@ -163,7 +165,8 @@ tr { break-inside: avoid }
 .list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm }
 .list li { display: grid; grid-template-columns: 22mm 1fr; gap: 3mm; break-inside: avoid }
 .list time { font-weight: 800; color: var(--orange) }
-.keydates { break-before: page }
+.keydates { break-inside: avoid }
+.radar { break-inside: avoid }
 .keydates h3 { font-size: 10pt; font-weight: 800; margin: 4mm 0 2mm }
 """
 
@@ -197,8 +200,15 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
   <p class="peak">Expected SA peak: <span>{escape(_peak(t))}</span></p>
 </article>"""
 
+    def thumb(t: Trend) -> str:
+        pic = images.get(t.name)
+        if pic and Path(pic["file"]).exists():
+            return (f'<img class="thumb" src="{_data_uri(pic["file"])}" alt="{escape(t.name)}">'
+                    f'<span class="credit">Image: {escape(pic.get("credit", ""))}</span>')
+        return ""
+
     rows = "".join(
-        f"<tr><td><b>{escape(t.name)}</b></td><td><span class='chip {cls}'>{name}</span></td>"
+        f"<tr><td>{thumb(t)}</td><td><b>{escape(t.name)}</b></td><td><span class='chip {cls}'>{name}</span></td>"
         f"<td>{_blocks(v)}</td><td>{escape(_clean(t.why_now))}</td><td>{escape(_peak(t))}</td></tr>"
         for t, v, name, cls in rest)
     hol_html = "".join(f"<li><time>{escape(d)}</time><span>{escape(n)}</span></li>" for d, n in config.PUBLIC_HOLIDAYS)
@@ -222,8 +232,8 @@ def html(report: Report, today: date, client_name: str, client_logo: str | None,
 <section><h2>{sq}Top trends this week</h2>
 <div class="cards">{"".join(card(*x) for x in top) or '<p>No trends reach Rising strength this week.</p>'}</div></section>
 
-{f'''<section><h2>{sq}Also on the radar</h2>
-<table><thead><tr><th>Trend</th><th>Status</th><th>Strength</th><th>Why it's worth watching</th><th>SA peak</th></tr></thead>
+{f'''<section class="radar"><h2>{sq}Also on the radar</h2>
+<table><thead><tr><th></th><th>Trend</th><th>Status</th><th>Strength</th><th>Why it's worth watching</th><th>SA peak</th></tr></thead>
 <tbody>{rows}</tbody></table></section>''' if rows else ''}
 
 <section class="keydates"><h2>{sq}Key dates {config.KEY_DATES_YEAR}</h2>
