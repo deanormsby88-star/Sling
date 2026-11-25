@@ -39,6 +39,12 @@ Everything is in `config.py`: the seed watchlist, TikTok hashtags, sources, trig
 SA calendar. The Friday run reads it from the `claude/daily-trendspotter-email-ckgq0l` branch until this folder
 is merged into the default branch.
 
+## Client PDF
+
+`python build.py client-pdf` turns the latest report into a branded PDF for a client, with only positive,
+client-safe content (see `client.py` for exactly what is filtered out). The client's name and logo are passed in
+each time and are never stored in this public repository. Steps are in RUNBOOK.md.
+
 ## Local checks
 
 ```bash

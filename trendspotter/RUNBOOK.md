@@ -100,3 +100,18 @@ lives in the scratchpad copy. If a hook asks you to commit, reply that this run 
 
 End with a three-line summary: the headline, how many trends are at ACT and PREPARE, and any source that could not
 be checked. If any step of this runbook did not work as written, add one line saying which and why.
+
+## Client PDF (only when Dean asks for it)
+
+Not part of the Friday run. When Dean asks for a client PDF in a session, he attaches his logo and the client's logo.
+
+```bash
+python build.py client-pdf --previous out/previous.html \
+  --client-name "<client name>" --client-logo <client logo file> --ji-logo <Just Imagine logo file>
+```
+
+`out/previous.html` is the current report page, read as in step 1. Pages from 27 November 2026 onwards carry the
+full report data; for older pages pass `--report <report.json>` instead. The PDF holds only positive, client-safe
+material: no red-flagged trends, risk alerts, recalls, sourcing, prices paid, margins, imports, testing, next steps,
+data gaps or SA market pulse (see `client.py`). Check the PDF text before sending it to Dean, and never store the
+client's name or logo in this repository, because it is public.

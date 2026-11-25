@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -83,16 +83,51 @@ def build_page(report: Report, state: dict, today, mode: str) -> str:
     order = {"ACT": 0, "PREPARE": 1, "WATCH": 2, "IGNORE": 3, "RED FLAG": 4}
     scored.sort(key=lambda x: (order[x.band], -x.score))
     return render.page(report, scored, today, mode, calendar_events.upcoming(today),
-                       state["archive"], history.to_script(state))
+                       state["archive"], history.to_script(state) + history.report_to_script(report.model_dump_json()))
+
+
+def client_pdf(args) -> int:
+    """Build the client-facing PDF from a published page (or a report JSON)."""
+    import subprocess
+
+    import client
+
+    if args.report:
+        report_json = Path(args.report).read_text()
+        when = datetime.fromisoformat(args.date).date() if args.date else datetime.now(SAST).date()
+    else:
+        page_html = _read(args.previous)
+        report_json = history.report_from_page(page_html or "")
+        if not report_json:
+            print("No report data in that page. Pass --report, or use a page built after this feature was added.", file=sys.stderr)
+            return 1
+        archive = history.from_page(page_html)["archive"]
+        when = (datetime.fromisoformat(args.date).date() if args.date
+                else date.fromisoformat(archive[0]["date"]) if archive else datetime.now(SAST).date())
+    if not args.client_name:
+        print("client-pdf needs --client-name", file=sys.stderr)
+        return 1
+    report = Report.model_validate_json(report_json)
+    out = Path(args.out if args.out != str(HERE / "out" / "trendspotter.html") else HERE / "out" / f"client-report-{when}.pdf")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    html_path = out.with_suffix(".html")
+    html_path.write_text(client.html(report, when, args.client_name, args.client_logo, args.ji_logo))
+    footer = f"Just Imagine Consulting · Prepared for {args.client_name} · Confidential"
+    subprocess.run(["node", str(HERE / "pdf.js"), str(html_path), str(out), footer], check=True)
+    print(f"Wrote {out}")
+    return 0
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("command", choices=["context", "page", "sample", "placeholder"])
+    ap.add_argument("command", choices=["context", "page", "sample", "placeholder", "client-pdf"])
     ap.add_argument("--previous", help="last week's published page (HTML), if any")
     ap.add_argument("--report", help="this week's report JSON")
     ap.add_argument("--out", default=str(HERE / "out" / "trendspotter.html"))
     ap.add_argument("--date", help="report date YYYY-MM-DD (default: today in SAST)")
+    ap.add_argument("--client-name", help="client-pdf: the client's name, shown on the cover")
+    ap.add_argument("--client-logo", help="client-pdf: path to the client's logo (PNG, JPG or SVG)")
+    ap.add_argument("--ji-logo", default=str(HERE / "brand" / "just-imagine-consulting.jpg"), help="client-pdf: Just Imagine logo")
     args = ap.parse_args()
 
     today = datetime.fromisoformat(args.date).date() if args.date else datetime.now(SAST).date()
@@ -101,6 +136,9 @@ def main() -> int:
     if args.command == "context":
         print(context(today, state))
         return 0
+
+    if args.command == "client-pdf":
+        return client_pdf(args)
 
     if args.command == "placeholder":
         out = Path(args.out)

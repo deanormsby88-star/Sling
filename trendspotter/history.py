@@ -38,6 +38,21 @@ def from_page(page_html: str | None) -> dict:
     return state
 
 
+REPORT_ID = "trendspotter-report"
+_REPORT_RE = re.compile(r'<script type="application/json" id="' + REPORT_ID + r'">(.*?)</script>', re.S)
+
+
+def report_to_script(report_json: str) -> str:
+    """Embed this week's full report JSON so a client PDF can be built from the page later."""
+    data = report_json.replace("<", "\\u003c")
+    return f'<script type="application/json" id="{REPORT_ID}">{data}</script>'
+
+
+def report_from_page(page_html: str) -> str | None:
+    m = _REPORT_RE.search(page_html or "")
+    return m.group(1) if m else None
+
+
 def to_script(state: dict) -> str:
     """Embed state as JSON. Escape '<' so the JSON can never close the script tag."""
     data = json.dumps(state, sort_keys=True, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
