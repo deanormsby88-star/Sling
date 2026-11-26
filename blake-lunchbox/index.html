@@ -1,0 +1,702 @@
+<title>Blake's Lunch Box</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: a toy-box app. One chunky header, then one big play area per part; flat bold shapes with an ink outline and a pressed-down "button" depth. */
+:root{
+  --sky:#9ADBF6; --sky-deep:#7CCBEE; --ink:#2B2142; --paper:#FFFFFF; --soft:#F3F7FB;
+  --tomato:#FF6B57; --sun:#FFC93C; --mint:#3FCF97; --grape:#9A7BF5; --berry:#FF85BE; --ocean:#4AA6F2; --orange:#FF9A3C;
+  --good:#1FA971; --warn:#E5484D; --muted:#5E5677;
+  --font-display:'Fredoka','Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  --font-body:'Nunito','Segoe UI',system-ui,sans-serif;
+  --emoji:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+  --r-lg:28px; --r-md:20px; --r-sm:14px; --line:3px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.45;
+  background-image:radial-gradient(circle at 20px 20px,var(--sky-deep) 7px,transparent 8px);background-size:64px 64px;
+  -webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:10px}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;line-height:1.1}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.top{padding-block:14px}
+.top .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--font-display);font-weight:700;font-size:clamp(22px,4vw,30px);background:none;border:0;padding:0;display:flex;align-items:center;gap:10px}
+.logo i{display:inline-block;width:38px;height:30px;border:var(--line) solid var(--ink);border-radius:10px;background:var(--tomato);position:relative}
+.logo i::before{content:"";position:absolute;left:8px;right:8px;top:-12px;height:10px;border:var(--line) solid var(--ink);border-bottom:0;border-radius:8px 8px 0 0}
+.spacer{flex:1}
+.stars{font-family:var(--font-display);font-weight:700;font-size:20px;background:var(--sun);border:var(--line) solid var(--ink);border-radius:999px;padding:4px 16px;display:flex;gap:6px;align-items:center}
+.stars b{font-size:22px;line-height:1}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-display);font-weight:600;font-size:20px;
+  padding:12px 22px;border:var(--line) solid var(--ink);border-radius:999px;background:var(--paper);box-shadow:0 5px 0 var(--ink);
+  transition:transform .08s, box-shadow .08s;min-height:52px;text-decoration:none}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn.go{background:var(--mint)} .btn.hot{background:var(--sun)} .btn.red{background:var(--tomato)} .btn.small{font-size:16px;padding:6px 14px;min-height:40px;box-shadow:0 3px 0 var(--ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:0 5px 0 var(--ink)}
+
+.panel{background:var(--paper);border:var(--line) solid var(--ink);border-radius:var(--r-lg);padding:20px}
+.view{padding-block:8px 48px;display:flex;flex-direction:column;gap:20px}
+.title-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.title-row h1{font-size:clamp(30px,6vw,46px)}
+.lead{font-size:19px;font-weight:700;margin:0;max-width:60ch}
+.muted{color:var(--muted)}
+
+/* home */
+.home-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:center}
+.home-hero h1{font-size:clamp(34px,7vw,60px)}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.tile{text-align:left;border:var(--line) solid var(--ink);border-radius:var(--r-lg);padding:18px;box-shadow:0 7px 0 var(--ink);display:flex;flex-direction:column;gap:8px;min-height:210px;transition:transform .1s}
+.tile:active{transform:translateY(5px);box-shadow:0 2px 0 var(--ink)}
+.tile .step{font-family:var(--font-display);font-weight:700;width:44px;height:44px;border-radius:50%;border:var(--line) solid var(--ink);background:var(--paper);display:grid;place-items:center;font-size:22px}
+.tile h2{font-size:28px}
+.tile p{margin:0;font-weight:700}
+.tile .status{margin-top:auto;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:4px 12px;font-weight:800;font-size:15px;align-self:flex-start}
+.t1{background:var(--berry)} .t2{background:var(--sun)} .t3{background:var(--mint)}
+details.grown{background:var(--paper);border:var(--line) solid var(--ink);border-radius:var(--r-lg);padding:6px 20px}
+details.grown summary{font-family:var(--font-display);font-weight:600;font-size:21px;cursor:pointer;padding:10px 0}
+details.grown ul{margin:0 0 12px;padding-left:22px;display:grid;gap:8px;max-width:70ch}
+details.grown .src{font-size:14px;color:var(--muted);max-width:75ch}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* lunch box art */
+.box-wrap{position:relative;width:100%;aspect-ratio:4/3;container-type:inline-size;user-select:none;-webkit-user-select:none;touch-action:none}
+.box-wrap svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stk{position:absolute;font-family:var(--emoji);font-size:12cqw;line-height:1;transform:translate(-50%,-50%) rotate(var(--r)) scale(var(--s));cursor:grab;padding:2px;border-radius:12px;touch-action:none}
+.stk.sel{outline:3px dashed var(--ink);outline-offset:2px;background:rgba(255,255,255,.35)}
+.static .stk{cursor:default}
+.box-wrap.static{touch-action:auto}
+
+/* designer */
+.designer{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+.stage{background:var(--paper);border:var(--line) solid var(--ink);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:12px;position:sticky;top:max(12px,env(safe-area-inset-top,0px))}
+.tools{display:flex;flex-direction:column;gap:16px}
+.tool h3{font-size:22px;margin-bottom:10px}
+.choices{display:flex;flex-wrap:wrap;gap:10px}
+.choice{border:var(--line) solid var(--ink);border-radius:var(--r-sm);background:var(--paper);padding:8px 12px;font-weight:800;min-height:48px;display:flex;align-items:center;gap:8px}
+.choice[aria-pressed="true"]{background:var(--sun);box-shadow:inset 0 -5px 0 rgba(43,33,66,.25)}
+.choice svg{width:56px;height:42px}
+.swatch{width:52px;height:52px;border-radius:50%;border:var(--line) solid var(--ink);padding:0}
+.swatch[aria-pressed="true"]{outline:4px solid var(--ink);outline-offset:3px}
+.tray-stk{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px}
+.tray-stk button{font-family:var(--emoji);font-size:32px;height:58px;border:var(--line) solid var(--ink);border-radius:var(--r-sm);background:var(--soft);position:relative}
+.tray-stk button.locked{font-family:var(--font-display);font-size:15px;font-weight:700;background:repeating-linear-gradient(45deg,var(--soft),var(--soft) 6px,var(--paper) 6px,var(--paper) 12px);color:var(--muted)}
+.selbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-height:44px}
+.name-in{font-family:var(--font-display);font-size:24px;font-weight:600;border:var(--line) solid var(--ink);border-radius:var(--r-sm);padding:8px 14px;width:100%;max-width:340px;color:var(--ink);background:var(--paper)}
+
+/* shopping */
+.groups{display:flex;flex-direction:column;gap:18px}
+.group{border:var(--line) solid var(--ink);border-radius:var(--r-lg);background:var(--paper);overflow:hidden}
+.group-head{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:var(--line) solid var(--ink);flex-wrap:wrap}
+.group-head .gi{font-family:var(--emoji);font-size:34px}
+.group-head h2{font-size:26px}
+.group-head p{margin:0;font-weight:700;font-size:15px}
+.group-head .need{margin-left:auto;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:4px 12px;font-weight:800;font-size:15px;white-space:nowrap}
+.need.ok{background:var(--mint)}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px;padding:16px}
+.food{border:var(--line) solid var(--ink);border-radius:var(--r-md);background:var(--soft);padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-weight:800;font-size:15px;line-height:1.15;min-height:118px;position:relative}
+.food .fe{font-family:var(--emoji);font-size:44px;line-height:1.1}
+.food small{font-weight:700;font-size:12px;color:var(--muted)}
+.food[aria-pressed="true"]{background:var(--gc,var(--sun));box-shadow:inset 0 -6px 0 rgba(43,33,66,.22)}
+.food[aria-pressed="true"]::after{content:"✓";position:absolute;top:-10px;right:-10px;width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:18px;font-family:var(--font-display)}
+.food[aria-pressed="true"] small{color:var(--ink)}
+.food:disabled{opacity:.4;cursor:not-allowed}
+.wiggle{animation:wig .4s}
+@keyframes wig{20%{transform:rotate(-6deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}}
+.pop{animation:pop .35s}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.dock{position:sticky;bottom:0;z-index:5;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-top:10px}
+.dock .panel{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 16px}
+.meter{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0}
+.chip{border:2px solid var(--ink);border-radius:999px;padding:3px 10px;font-weight:800;font-size:14px;background:var(--soft);display:flex;gap:6px;align-items:center;white-space:nowrap}
+.chip .ce{font-family:var(--emoji)}
+.chip.ok{background:var(--mint)} .chip.over{background:var(--tomato)}
+.toast{font-weight:800;min-height:1.4em}
+.toast.bad{color:var(--warn)}
+
+/* decorate */
+.deco{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.paper-wrap{position:relative;width:100%;aspect-ratio:1240/1754;container-type:inline-size;border:var(--line) solid var(--ink);border-radius:12px;overflow:hidden;background:var(--paper);touch-action:none}
+.paper-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
+.paper-wrap .stk{font-size:12cqw}
+.paper-wrap.static{touch-action:auto}
+.paper-img{width:100%;height:auto;border:var(--line) solid var(--ink);border-radius:12px;display:block;background:var(--paper)}
+
+/* packing */
+.pack{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:16px;align-items:stretch}
+.tray{border:6px solid var(--ink);border-radius:36px;padding:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;position:relative}
+.well{background:var(--paper);border:var(--line) solid var(--ink);border-radius:var(--r-md);min-height:150px;padding:10px;display:flex;flex-direction:column;gap:6px;position:relative}
+.well.big{grid-row:span 1}
+.well h3{font-size:18px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+.well h3 span{font-family:var(--font-body);font-size:12px;font-weight:800;border:2px solid var(--ink);border-radius:999px;padding:1px 8px;background:var(--soft);white-space:nowrap}
+.well.full h3 span{background:var(--mint)}
+.well .in{display:flex;flex-wrap:wrap;gap:6px;flex:1;align-content:center;justify-content:center}
+.well .in button{border:0;background:none;padding:2px;display:flex;flex-direction:column;align-items:center;font-weight:800;font-size:15px;line-height:1.1;max-width:100%}
+.well .in button .fe{font-family:var(--emoji);font-size:54px;line-height:1.05}
+.well .empty{color:var(--muted);font-weight:700;font-size:14px;text-align:center}
+.bottle{border:6px solid var(--ink);border-radius:36px;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center;font-weight:800}
+.bottle svg{width:70px;height:150px}
+.shelf{display:flex;flex-direction:column;gap:14px}
+.shelf-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.shelf-row .lab{font-family:var(--font-display);font-weight:600;font-size:18px;min-width:120px;display:flex;gap:6px;align-items:center}
+.shelf-row .lab .ce{font-family:var(--emoji)}
+.shelf .food{min-height:96px;width:118px}
+.shelf .food .fe{font-size:38px}
+.daypick{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.daypick strong{font-family:var(--font-display);font-size:22px;font-weight:600}
+.done{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.checklist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.checklist li{display:flex;gap:10px;align-items:center;font-weight:800;font-size:18px;border-bottom:2px dashed var(--soft);padding-bottom:8px}
+.checklist .fe{font-family:var(--emoji);font-size:28px;width:36px;text-align:center}
+.checklist .g{margin-left:auto;font-size:13px;color:var(--muted)}
+.cheer{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,6vw,48px)}
+.confirm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--soft);border:2px solid var(--ink);border-radius:var(--r-sm);padding:10px 14px;font-weight:800}
+.modal-img{max-width:100%;border:var(--line) solid var(--ink);border-radius:12px}
+
+@media (max-width:820px){
+  .home-hero,.designer,.deco,.done{grid-template-columns:minmax(0,1fr)}
+  .tiles{grid-template-columns:minmax(0,1fr)}
+  .tile{min-height:0}
+  .stage{position:static}
+  .pack{grid-template-columns:minmax(0,1fr)}
+  .bottle{flex-direction:row;border-radius:24px}
+  .bottle svg{width:40px;height:80px}
+}
+@media (max-width:520px){
+  .tray{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px;gap:8px;border-radius:26px}
+  .well .in button .fe{font-size:42px}
+  .shelf .food{width:calc(50% - 5px)}
+  .shelf-row .lab{min-width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top"><div class="wrap">
+  <button class="logo" data-go="" aria-label="Home"><i aria-hidden="true"></i><span id="appName">Blake's Lunch Box</span></button>
+  <span class="spacer"></span>
+  <span class="stars" title="Stars earned"><b aria-hidden="true">★</b><span id="starCount">0</span><span class="sr" style="position:absolute;left:-9999px">stars</span></span>
+</div></header>
+<main id="view" class="wrap view" aria-live="polite"></main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ---------- food data (South African Food-Based Dietary Guidelines groups) ---------- */
+const GROUPS = [
+  {id:'fruit', name:'Fruit', e:'🍎', col:'#FF6B57', blurb:'Sweet, juicy and full of vitamin C.', min:3, max:5, items:[
+    ['banana','Bananas','🍌'],['apple','Apples','🍎'],['pear','Pears','🍐'],['naartjie','Naartjies','🍊'],
+    ['grapes','Grapes','🍇'],['straw','Strawberries','🍓'],['blue','Blueberries','🫐'],['melon','Melon','🍈'],
+    ['water-m','Watermelon','🍉'],['mango','Mango','🥭'],['peach','Peaches','🍑'],['pine','Pineapple','🍍'],['kiwi','Kiwi','🥝']]},
+  {id:'veg', name:'Veggies', e:'🥕', col:'#3FCF97', blurb:'Crunchy colours. A tiny try-it bite counts.', min:2, max:4, items:[
+    ['cucumber','Cucumber','🥒'],['carrot','Carrots','🥕'],['tomato','Baby tomatoes','🍅'],['corn','Corn','🌽'],
+    ['peas','Peas','🫛'],['avo','Avocado','🥑'],['sweetpot','Sweet potato','🍠'],['broc','Broccoli','🥦'],['pepper','Peppers','🫑']]},
+  {id:'protein', name:'Protein', e:'🥚', col:'#9A7BF5', blurb:'Helps you grow strong and get better when sick.', min:3, max:4, items:[
+    ['egg','Eggs','🥚'],['chicken','Chicken','🍗'],['tuna','Tuna in water','🐟'],['mince','Beef mince','🥩'],
+    ['pb','Peanut butter','🥜','no added sugar'],['beans','Baked beans','🫘'],['fishf','Fish fingers','🍤'],['hummus','Hummus','🧆']]},
+  {id:'dairy', name:'Dairy', e:'🥛', col:'#4AA6F2', blurb:'Calcium for strong bones and teeth.', min:2, max:3, items:[
+    ['milk','Milk','🥛'],['yog','Plain yoghurt','🥣'],['cheese','Cheddar cheese','🧀'],['maas','Maas','🍶'],['cottage','Cottage cheese','🫙']]},
+  {id:'energy', name:'Energy foods', e:'🍞', col:'#FFC93C', blurb:'Fuel for running, playing and thinking.', min:2, max:4, items:[
+    ['bread','Brown bread','🍞'],['rolls','Mini rolls','🥖'],['wrap','Wraps','🌯'],['pita','Pitas','🫓'],
+    ['crackers','Wholewheat crackers','🍘'],['pasta','Pasta','🍝'],['rice','Rice','🍚'],['potato','Potatoes','🥔'],
+    ['weetbix','Weet-Bix','🌾'],['oats','Plain oats','🥣'],['popcorn','Popcorn kernels','🍿']]},
+  {id:'treat', name:'Treat', e:'🍫', col:'#FF85BE', blurb:'One small treat a week, eaten with a meal.', min:0, max:1, items:[
+    ['choc','Small chocolate','🍫'],['biscuit','Biscuits','🍪'],['icecream','Ice cream','🍦'],['muffin','Banana muffins','🧁']]}
+];
+const G = {}; const ITEM = {};
+GROUPS.forEach(g=>{ G[g.id]=g; g.items=g.items.map(a=>{const it={id:a[0],name:a[1],e:a[2],hint:a[3]||'',g:g.id}; ITEM[it.id]=it; return it;}); });
+
+/* lunch box rules: one energy, one protein, one fruit, one dairy; veg try-it bite and treat optional */
+const LUNCH = [
+  {g:'energy', label:'Energy', min:1, max:1},
+  {g:'protein', label:'Protein', min:1, max:1},
+  {g:'fruit', label:'Fruit', min:1, max:2},
+  {g:'dairy', label:'Dairy', min:1, max:1},
+  {g:'veg', label:'Try-it veg', min:0, max:1},
+  {g:'treat', label:'Treat', min:0, max:1}
+];
+const LR = {}; LUNCH.forEach(r=>LR[r.g]=r);
+
+const STICKERS = [
+  ['⭐',0],['🌈',0],['🌸',0],['🐶',0],['🐱',0],['🦋',0],['🍓',0],['⚽',0],['🎀',0],['💖',0],['🌻',0],['🐝',0],
+  ['🐼',2],['🦄',3],['🐬',4],['🚀',5],['🌙',6],['🦖',8],['🎨',10],['👑',12],['🐙',15],['🧚',20]
+];
+const COLOURS = ['#FF6B57','#FF9A3C','#FFC93C','#8EDB4F','#3FCF97','#2EC4C6','#4AA6F2','#9A7BF5','#FF85BE','#2B2142'];
+const SHAPES = [['classic','Classic'],['bento','Bento'],['tin','Tin'],['bubble','Bubble']];
+const PATTERNS = [['dots','Dots'],['stripes','Stripes'],['stars','Stars'],['hearts','Hearts'],['checks','Checks'],['plain','Plain']];
+const PAPERS = [['#FFFFFF','White'],['#FFF6C9','Lemon'],['#DDF8EC','Mint'],['#FFE3F0','Pink'],['#E1F3FF','Sky']];
+const BORDERS = [['rainbow','Rainbow'],['dots','Dots'],['dash','Dashes'],['none','Plain']];
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n=>String(n).padStart(2,'0');
+const keyOf = d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const fromKey = k=>{const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d);};
+const addDays = (d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x;};
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const nice = d=>DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()];
+const short = d=>DAYS[d.getDay()].slice(0,3)+' '+d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3);
+function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const w=(x.getDay()+6)%7; return addDays(x,-w);}
+function shopWeekStart(){const t=new Date(); const wd=t.getDay(); return (wd===6||wd===0)? mondayOf(addDays(t,7)) : mondayOf(t);}
+function nextSchoolDay(from){let d=addDays(new Date(from.getFullYear(),from.getMonth(),from.getDate()),1); while(d.getDay()===0||d.getDay()===6) d=addDays(d,1); return d;}
+function stepSchoolDay(d,dir){let x=addDays(d,dir); while(x.getDay()===0||x.getDay()===6) x=addDays(x,dir); return x;}
+function shade(hex,amt){const n=parseInt(hex.slice(1),16); let r=n>>16,g=(n>>8)&255,b=n&255; const t=amt<0?0:255,p=Math.abs(amt);
+  r=Math.round((t-r)*p+r); g=Math.round((t-g)*p+g); b=Math.round((t-b)*p+b); return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+function lum(hex){const n=parseInt(hex.slice(1),16); return (0.299*(n>>16)+0.587*((n>>8)&255)+0.114*(n&255))/255;}
+
+/* ---------- state + storage ---------- */
+const LS='blake-lunchbox-v1';
+function fresh(){return {v:1, updatedAt:0, stars:0, sound:true,
+  profile:{name:'Blake', shape:'classic', color:'#FF85BE', pattern:'dots', stickers:[{e:'🌈',x:24,y:72,r:-12,s:1},{e:'⭐',x:79,y:34,r:12,s:.8}]},
+  week:null, deco:{paper:'#FFFFFF', border:'rainbow', title:"Blake's Shopping List", stickers:[{e:'🍓',x:86,y:7,r:14,s:.9}]}, lunches:{}};}
+let S = fresh();
+try{ const raw=localStorage.getItem(LS); if(raw){ S=Object.assign(fresh(), JSON.parse(raw)); } }catch(e){}
+let db=null, ref=null, saveT=null;
+function save(){
+  S.updatedAt=Date.now();
+  const cut=keyOf(addDays(new Date(),-60)); Object.keys(S.lunches).forEach(k=>{ if(k<cut) delete S.lunches[k]; });
+  try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){}
+  clearTimeout(saveT); saveT=setTimeout(()=>{ if(ref) ref.set(JSON.parse(JSON.stringify(S))).catch(()=>{}); }, 700);
+}
+async function connect(){
+  try{
+    if(!window.claude || !window.claude.use) return;
+    db = await window.claude.use('db'); if(!db) return;
+    ref = db.doc('family/lunchbox');
+    const snap = await Promise.race([ref.get(), new Promise((_,rej)=>setTimeout(()=>rej('timeout'),10000))]);
+    if(snap.exists){ const d=snap.data(); if(d && (d.updatedAt||0) > (S.updatedAt||0)){ S=Object.assign(fresh(), JSON.parse(JSON.stringify(d))); try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){} render(); } }
+    else if(S.updatedAt){ ref.set(JSON.parse(JSON.stringify(S))).catch(()=>{}); }
+  }catch(e){ /* keep local copy */ }
+}
+
+/* ---------- sound ---------- */
+let ac=null;
+function blip(kind){
+  if(!S.sound) return;
+  try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(), g=ac.createGain(); o.connect(g); g.connect(ac.destination);
+    const t=ac.currentTime; const f = kind==='no'?190: kind==='win'?660:520; o.type=kind==='no'?'square':'triangle';
+    o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(kind==='no'?140:f*1.6,t+.12);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.18,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+(kind==='win'?.45:.18));
+    o.start(t); o.stop(t+.5);
+    if(kind==='win'){ const o2=ac.createOscillator(),g2=ac.createGain(); o2.connect(g2); g2.connect(ac.destination); o2.type='triangle'; o2.frequency.setValueAtTime(880,t+.15); g2.gain.setValueAtTime(.0001,t+.15); g2.gain.exponentialRampToValueAtTime(.16,t+.18); g2.gain.exponentialRampToValueAtTime(.0001,t+.6); o2.start(t+.15); o2.stop(t+.7); }
+  }catch(e){}
+}
+
+/* ---------- lunch box art ---------- */
+let uidN=0;
+function boxSVG(p, opts){
+  opts=opts||{}; const id='b'+(++uidN); const c=p.color, dk=shade(c,-.3), lt=shade(c,.35);
+  const ink='#2B2142'; const onc = lum(c)>.55 ? ink : '#FFFFFF';
+  let body='', extra='', handle='';
+  if(p.shape==='bento'){ body='<rect x="18" y="62" width="364" height="216" rx="72"/>'; extra=`<rect x="178" y="62" width="44" height="216" fill="${dk}" clip-path="url(#c${id})"/>`; }
+  else if(p.shape==='tin'){ body='<rect x="38" y="56" width="324" height="222" rx="18"/>'; extra=`<rect x="28" y="48" width="344" height="34" rx="12" fill="${dk}" stroke="${ink}" stroke-width="6"/><rect x="92" y="74" width="34" height="40" rx="8" fill="${lt}" stroke="${ink}" stroke-width="5"/><rect x="274" y="74" width="34" height="40" rx="8" fill="${lt}" stroke="${ink}" stroke-width="5"/>`; handle=`<path d="M160 50 V34 H240 V50" fill="none" stroke="${ink}" stroke-width="12" stroke-linejoin="round"/>`; }
+  else if(p.shape==='bubble'){ body='<rect x="36" y="62" width="328" height="218" rx="109"/>'; handle=`<path d="M138 74 Q200 -12 262 74" fill="none" stroke="${ink}" stroke-width="22" stroke-linecap="round"/><path d="M138 74 Q200 -12 262 74" fill="none" stroke="${dk}" stroke-width="10" stroke-linecap="round"/>`; }
+  else { body='<rect x="30" y="66" width="340" height="212" rx="34"/>'; handle=`<path d="M146 70 V46 Q146 26 166 26 H234 Q254 26 254 46 V70" fill="none" stroke="${ink}" stroke-width="22" stroke-linecap="round"/><path d="M146 70 V46 Q146 26 166 26 H234 Q254 26 254 46 V70" fill="none" stroke="${dk}" stroke-width="10" stroke-linecap="round"/>`; extra=`<line x1="30" y1="132" x2="370" y2="132" stroke="${ink}" stroke-width="5"/><rect x="180" y="118" width="40" height="30" rx="8" fill="${lt}" stroke="${ink}" stroke-width="5"/>`; }
+  const pw='rgba(255,255,255,.38)';
+  const pats={
+    dots:`<pattern id="p${id}" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="6" fill="${pw}"/><circle cx="30" cy="30" r="6" fill="${pw}"/></pattern>`,
+    stripes:`<pattern id="p${id}" width="36" height="36" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="16" height="36" fill="${pw}"/></pattern>`,
+    stars:`<pattern id="p${id}" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M14 4l3 7 7 .5-5.5 4.5 2 7-6.5-4-6.5 4 2-7L4 11.5 11 11z" fill="${pw}"/><path d="M42 30l3 7 7 .5-5.5 4.5 2 7-6.5-4-6.5 4 2-7-5.5-4.5 7-.5z" fill="${pw}"/></pattern>`,
+    hearts:`<pattern id="p${id}" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M14 22c-8-6-10-10-10-13a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 3-2 7-10 13z" fill="${pw}"/><path d="M38 46c-8-6-10-10-10-13a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 3-2 7-10 13z" fill="${pw}"/></pattern>`,
+    checks:`<pattern id="p${id}" width="48" height="48" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="${pw}"/><rect x="24" y="24" width="24" height="24" fill="${pw}"/></pattern>`,
+    plain:''
+  };
+  const name = opts.noName? '' : `<text x="200" y="${p.shape==='tin'?205:212}" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="${Math.max(24,Math.min(48, 300/Math.max(1,(p.name||'').length)*1.7))}" fill="${onc}" stroke="${onc===ink?'#FFFFFF':ink}" stroke-width="7" paint-order="stroke" stroke-linejoin="round">${esc(p.name||'')}</text>`;
+  return `<svg viewBox="0 0 400 300" aria-hidden="true"><defs><clipPath id="c${id}">${body}</clipPath>${pats[p.pattern]||''}</defs>
+  ${handle}
+  <g fill="${c}" stroke="${ink}" stroke-width="7">${body}</g>
+  ${p.pattern!=='plain'?`<rect x="0" y="0" width="400" height="300" fill="url(#p${id})" clip-path="url(#c${id})"/>`:''}
+  <rect x="52" y="${p.shape==='tin'?92:84}" width="110" height="16" rx="8" fill="rgba(255,255,255,.45)" clip-path="url(#c${id})"/>
+  ${extra}
+  <g fill="none" stroke="${ink}" stroke-width="7">${body}</g>
+  ${name}</svg>`;
+}
+function stickersHTML(list, sel){
+  return list.map((s,i)=>`<span class="stk${i===sel?' sel':''}" data-i="${i}" style="left:${s.x}%;top:${s.y}%;--r:${s.r||0}deg;--s:${s.s||1}">${esc(s.e)}</span>`).join('');
+}
+
+/* sticker board: drag to move, tap to select */
+let sel = -1;
+function bindBoard(wrap, list, onSel){
+  let drag=null;
+  wrap.addEventListener('pointerdown', e=>{
+    const t=e.target.closest('.stk'); if(!t){ if(sel!==-1){ sel=-1; onSel(); } return; }
+    e.preventDefault(); const i=+t.dataset.i; const r=wrap.getBoundingClientRect();
+    drag={i, el:t, r, moved:false, sx:e.clientX, sy:e.clientY};
+    if(sel!==i){ sel=i; wrap.querySelectorAll('.stk').forEach(x=>x.classList.toggle('sel', +x.dataset.i===i)); onSel(true); }
+    try{ wrap.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  wrap.addEventListener('pointermove', e=>{
+    if(!drag) return; if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>3) drag.moved=true;
+    const x=Math.max(3,Math.min(97,(e.clientX-drag.r.left)/drag.r.width*100)), y=Math.max(3,Math.min(97,(e.clientY-drag.r.top)/drag.r.height*100));
+    list[drag.i].x=Math.round(x*10)/10; list[drag.i].y=Math.round(y*10)/10; drag.el.style.left=x+'%'; drag.el.style.top=y+'%';
+  });
+  const end=()=>{ if(drag){ if(drag.moved) save(); drag=null; } };
+  wrap.addEventListener('pointerup', end); wrap.addEventListener('pointercancel', end);
+}
+function selbarHTML(list){
+  if(sel<0||!list[sel]) return '<span class="muted" style="font-weight:700">Tap a sticker below to add it. Drag stickers to move them. Tap one to change it.</span>';
+  return `<button class="btn small" data-act="stk-big">Bigger</button><button class="btn small" data-act="stk-small">Smaller</button><button class="btn small" data-act="stk-turn">Turn</button><button class="btn small red" data-act="stk-del">Peel off</button>`;
+}
+function stickerTray(){
+  return STICKERS.map(([e,at])=> S.stars>=at ? `<button data-act="stk-add" data-e="${e}" aria-label="Add sticker">${e}</button>` : `<button class="locked" disabled aria-label="Locked: needs ${at} stars">★${at}</button>`).join('');
+}
+function stickerAct(act, list, el){
+  if(act==='stk-add'){ if(list.length>=24){ return 'That is lots of stickers. Peel one off first.'; } list.push({e:el.dataset.e, x:30+Math.random()*40, y:30+Math.random()*40, r:Math.round(Math.random()*30-15), s:1}); sel=list.length-1; blip('pop'); }
+  const s=list[sel]; if(!s) return;
+  if(act==='stk-big') s.s=Math.min(2.2, +(s.s+.2).toFixed(2));
+  if(act==='stk-small') s.s=Math.max(.4, +(s.s-.2).toFixed(2));
+  if(act==='stk-turn') s.r=((s.r||0)+20)%360;
+  if(act==='stk-del'){ list.splice(sel,1); sel=-1; }
+}
+
+/* ---------- views ---------- */
+let route = '';
+let msg = {text:'', bad:false};
+let shopStep = 'pick';
+let packDay = null;
+let confirmReset = false;
+let pdfFallback = null;
+
+function render(){
+  $('#starCount').textContent = S.stars;
+  $('#appName').textContent = (S.profile.name||'My')+"'s Lunch Box";
+  document.title = (S.profile.name||'My')+"'s Lunch Box";
+  const v=$('#view');
+  if(route==='box') v.innerHTML=viewBox();
+  else if(route==='shop') v.innerHTML=viewShop();
+  else if(route==='pack') v.innerHTML=viewPack();
+  else v.innerHTML=viewHome();
+  afterRender();
+}
+
+function viewHome(){
+  const w=S.week; const target=nextSchoolDay(new Date()); const L=S.lunches[keyOf(target)];
+  const shopStatus = !w ? 'Not made yet' : w.made ? 'Ready for week of '+short(fromKey(w.start)) : w.items.length+' things picked so far';
+  const packStatus = !w ? 'Make a shopping list first' : (L&&L.packed) ? 'Packed for '+DAYS[target.getDay()]+' ✓' : 'Pack for '+DAYS[target.getDay()];
+  return `
+  <section class="home-hero">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h1>Hi ${esc(S.profile.name||'there')}! What shall we do?</h1>
+      <p class="lead">Design your lunch box, choose the week's shopping, then pack a balanced lunch each evening.</p>
+    </div>
+    <div class="box-wrap static">${boxSVG(S.profile)}${stickersHTML(S.profile.stickers,-1)}</div>
+  </section>
+  <section class="tiles">
+    <button class="tile t1" data-go="box"><span class="step">1</span><h2>My lunch box</h2><p>Pick a shape, colours and stickers.</p><span class="status">${S.profile.stickers.length} stickers</span></button>
+    <button class="tile t2" data-go="shop"><span class="step">2</span><h2>Shopping day</h2><p>Fill the basket so every food group is happy.</p><span class="status">${esc(shopStatus)}</span></button>
+    <button class="tile t3" data-go="pack"><span class="step">3</span><h2>Pack my lunch</h2><p>Every evening, pack tomorrow's lunch box.</p><span class="status">${esc(packStatus)}</span></button>
+  </section>
+  <details class="grown">
+    <summary>Grown-ups' corner</summary>
+    <p style="margin-top:0;font-weight:700">How the game keeps things balanced</p>
+    <ul>
+      <li><b>Weekly list:</b> 3 to 5 fruits, 2 to 4 veggies, 3 to 4 proteins, 2 to 3 dairy, 2 to 4 energy foods, and at most one treat.</li>
+      <li><b>Each lunch box:</b> one energy food, one protein, one or two fruits and one dairy, with water as the drink. A veggie is an optional "try-it bite" and earns a bonus star. A treat can go in one lunch box a week.</li>
+      <li><b>Water first, plain milk second.</b> Juice, flavoured milk and fizzy drinks are left out of the game on purpose.</li>
+      <li><b>No pressure on the try-it food.</b> Blake chooses whether and how much to eat; repeated, calm exposure works better than bribes or rules.</li>
+      <li><b>Treats with meals, not grazing.</b> Fewer sugar contacts a day protects teeth more than banning dessert. Look for "no added sugar" peanut butter and plain yoghurt.</li>
+      <li>This game supports healthy habits. It does not replace checks with her dentist, GP or paediatrician about the cavities and frequent illness.</li>
+    </ul>
+    <p class="src">Based on your nutrition research: South African Food-Based Dietary Guidelines (ages 5+); WHO guideline on free sugars and dental caries; UNICEF South Africa guidance on fussy eating; DRI reference intakes for ages 4 to 8.</p>
+    <div class="row" style="margin:12px 0 14px">
+      <button class="btn small" data-act="sound">${S.sound?'Sound: on':'Sound: off'}</button>
+      ${confirmReset ? `<span class="confirm">Start again? This clears the lunch box, list and stars. <button class="btn small red" data-act="reset-yes">Yes, clear it</button><button class="btn small" data-act="reset-no">Keep it</button></span>` : `<button class="btn small" data-act="reset">Start again</button>`}
+    </div>
+  </details>`;
+}
+
+function viewBox(){
+  const p=S.profile;
+  return `
+  <div class="title-row"><h1>My lunch box</h1></div>
+  <section class="designer">
+    <div class="stage">
+      <div class="box-wrap" id="board">${boxSVG(p)}${stickersHTML(p.stickers, sel)}</div>
+      <div class="selbar" id="selbar">${selbarHTML(p.stickers)}</div>
+    </div>
+    <div class="tools">
+      <div class="panel tool"><h3>Name on the lid</h3><input id="nameIn" class="name-in" maxlength="14" value="${esc(p.name)}" aria-label="Name on the lid" autocomplete="off"></div>
+      <div class="panel tool"><h3>Shape</h3><div class="choices">${SHAPES.map(([k,l])=>`<button class="choice" data-act="shape" data-v="${k}" aria-pressed="${p.shape===k}">${boxSVG(Object.assign({},p,{shape:k,stickers:[]}),{noName:true})}${l}</button>`).join('')}</div></div>
+      <div class="panel tool"><h3>Colour</h3><div class="choices">${COLOURS.map(c=>`<button class="swatch" data-act="color" data-v="${c}" style="background:${c}" aria-label="Colour" aria-pressed="${p.color===c}"></button>`).join('')}</div></div>
+      <div class="panel tool"><h3>Pattern</h3><div class="choices">${PATTERNS.map(([k,l])=>`<button class="choice" data-act="pattern" data-v="${k}" aria-pressed="${p.pattern===k}">${l}</button>`).join('')}</div></div>
+      <div class="panel tool"><h3>Stickers</h3><div class="tray-stk">${stickerTray()}</div><p class="muted" style="margin:10px 0 0;font-weight:700;font-size:14px">Earn stars by packing lunches to unlock more stickers.</p></div>
+      <div class="row"><button class="btn go" data-go="">All done</button></div>
+    </div>
+  </section>`;
+}
+
+/* shopping */
+function groupCount(g){ return S.week ? S.week.items.filter(id=>ITEM[id]&&ITEM[id].g===g).length : 0; }
+function weekBalanced(){ return GROUPS.every(g=>{const n=groupCount(g.id); return n>=g.min&&n<=g.max;}); }
+function needText(g,n){ if(g.max===1&&g.min===0) return n? 'Treat chosen':'Up to 1'; if(n<g.min) return `Pick ${g.min-n} more`; if(n>g.max) return 'Too many'; return n+' picked ✓'; }
+function viewShop(){
+  if(!S.week){ return `<div class="title-row"><h1>Shopping day</h1></div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:14px;align-items:flex-start"><p class="lead">Let's fill the trolley for the week of ${nice(shopWeekStart())}.</p><button class="btn go" data-act="new-week">Start my list</button></div>`; }
+  const w=S.week;
+  if(shopStep==='decorate') return viewDecorate();
+  if(w.made && shopStep!=='pick') return viewShopDone();
+  return `
+  <div class="title-row"><h1>Shopping day</h1><span class="muted" style="font-weight:800">Week of ${nice(fromKey(w.start))}</span></div>
+  <p class="lead">Fill every food group's bubble. Tap a food to put it in the trolley, tap again to take it out.</p>
+  <div class="groups">${GROUPS.map(g=>{const n=groupCount(g.id); const ok=n>=g.min&&n<=g.max; return `
+    <section class="group"><div class="group-head" style="background:${g.col}"><span class="gi" aria-hidden="true">${g.e}</span><div><h2>${g.name}</h2><p>${esc(g.blurb)}</p></div><span class="need${ok?' ok':''}">${g.min===g.max?g.min:g.min+' to '+g.max} · ${needText(g,n)}</span></div>
+    <div class="items">${g.items.map(it=>`<button class="food" data-act="pick" data-id="${it.id}" style="--gc:${g.col}" aria-pressed="${w.items.includes(it.id)}"><span class="fe" aria-hidden="true">${it.e}</span>${esc(it.name)}${it.hint?`<small>${esc(it.hint)}</small>`:''}</button>`).join('')}</div></section>`;}).join('')}
+  </div>
+  <div class="dock"><div class="panel">
+    <div class="meter">${GROUPS.map(g=>{const n=groupCount(g.id); const cls=n>g.max?'over':(n>=g.min&&(g.min>0||n>0))?'ok':''; return `<span class="chip ${cls}"><span class="ce" aria-hidden="true">${g.e}</span>${g.name} ${n}/${g.max}</span>`;}).join('')}</div>
+    <span class="toast ${msg.bad?'bad':''}" id="toast">${esc(msg.text)}</span>
+    <button class="btn go" data-act="to-deco" ${weekBalanced()?'':'disabled'}>Decorate my list</button>
+  </div></div>`;
+}
+function viewDecorate(){
+  const d=S.deco;
+  return `
+  <div class="title-row"><h1>Decorate my list</h1></div>
+  <section class="deco">
+    <div class="stage">
+      <div class="paper-wrap" id="board"><canvas id="paperCv" width="1240" height="1754"></canvas>${stickersHTML(d.stickers, sel)}</div>
+      <div class="selbar" id="selbar">${selbarHTML(d.stickers)}</div>
+    </div>
+    <div class="tools">
+      <div class="panel tool"><h3>Title</h3><input id="titleIn" class="name-in" maxlength="28" value="${esc(d.title)}" aria-label="List title" autocomplete="off"></div>
+      <div class="panel tool"><h3>Paper</h3><div class="choices">${PAPERS.map(([c,l])=>`<button class="choice" data-act="paper" data-v="${c}" aria-pressed="${d.paper===c}"><span class="swatch" style="width:28px;height:28px;background:${c};display:inline-block"></span>${l}</button>`).join('')}</div></div>
+      <div class="panel tool"><h3>Border</h3><div class="choices">${BORDERS.map(([k,l])=>`<button class="choice" data-act="border" data-v="${k}" aria-pressed="${d.border===k}">${l}</button>`).join('')}</div></div>
+      <div class="panel tool"><h3>Stickers</h3><div class="tray-stk">${stickerTray()}</div></div>
+      <div class="row"><button class="btn" data-act="to-pick">Back to the food</button><button class="btn hot" data-act="make-pdf">Print my list</button></div>
+      <span class="toast ${msg.bad?'bad':''}" id="toast">${esc(msg.text)}</span>
+      ${pdfFallback?`<div class="panel"><p style="margin-top:0;font-weight:800">Saving files isn't available here, so here is your list as a picture. Press and hold it (or right-click) to save or print it.</p><img class="modal-img" alt="Shopping list" src="${pdfFallback}"></div>`:''}
+    </div>
+  </section>`;
+}
+function viewShopDone(){
+  const w=S.week;
+  return `
+  <div class="title-row"><h1>Your list is ready</h1><span class="muted" style="font-weight:800">Week of ${nice(fromKey(w.start))}</span></div>
+  <section class="deco">
+    <div class="paper-wrap static"><canvas id="paperCv" width="1240" height="1754" data-full="1"></canvas></div>
+    <div class="tools">
+      <p class="lead">Take it to the shops and tick things off as they go in the trolley. Each evening, use these foods to pack your lunch box.</p>
+      <div class="row"><button class="btn hot" data-act="make-pdf">Print it again</button><button class="btn" data-act="to-deco">Decorate it</button><button class="btn" data-act="to-pick">Change the food</button></div>
+      <div class="row"><button class="btn go" data-go="pack">Pack my lunch</button></div>
+      <span class="toast ${msg.bad?'bad':''}" id="toast">${esc(msg.text)}</span>
+      <div class="panel" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+        <p style="margin:0;font-weight:800">New week? Start a fresh list. Your decorations stay.</p>
+        ${confirmReset?`<span class="confirm">Clear this week's food? <button class="btn small red" data-act="new-week">Yes, new list</button><button class="btn small" data-act="reset-no">Keep it</button></span>`:`<button class="btn small" data-act="ask-new">New week's list</button>`}
+      </div>
+      ${pdfFallback?`<div class="panel"><p style="margin-top:0;font-weight:800">Saving files isn't available here, so here is your list as a picture. Press and hold it (or right-click) to save or print it.</p><img class="modal-img" alt="Shopping list" src="${pdfFallback}"></div>`:''}
+    </div>
+  </section>`;
+}
+
+/* shopping list drawing (A4 at 150 dpi) */
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function fitFont(ctx,text,weight,size,family,maxW,minSize){ let s=size; ctx.font=`${weight} ${s}px ${family}`; while(ctx.measureText(text).width>maxW && s>minSize){ s-=2; ctx.font=`${weight} ${s}px ${family}`; } return s; }
+function drawList(cv, withStickers){
+  const W=1240,H=1754, ctx=cv.getContext('2d'), d=S.deco, w=S.week; const INK='#2B2142';
+  const DISP='Fredoka, sans-serif', BODY='Nunito, sans-serif', EMO='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H); ctx.fillStyle=d.paper; ctx.fillRect(0,0,W,H);
+  ctx.save();
+  if(d.border==='rainbow'){ ['#FF6B57','#FFC93C','#3FCF97','#4AA6F2','#9A7BF5'].forEach((c,i)=>{ ctx.strokeStyle=c; ctx.lineWidth=14; rr(ctx,34+i*14,34+i*14,W-68-i*28,H-68-i*28,60-i*8); ctx.stroke(); }); }
+  else if(d.border==='dots'){ const cols=['#FF6B57','#FFC93C','#3FCF97','#4AA6F2','#9A7BF5','#FF85BE']; let k=0; const step=62;
+    for(let x=60;x<=W-60;x+=step){ [60,H-60].forEach(y=>{ctx.fillStyle=cols[k++%6]; ctx.beginPath(); ctx.arc(x,y,16,0,7); ctx.fill();}); }
+    for(let y=60+step;y<=H-60-step/2;y+=step){ [60,W-60].forEach(x=>{ctx.fillStyle=cols[k++%6]; ctx.beginPath(); ctx.arc(x,y,16,0,7); ctx.fill();}); } }
+  else if(d.border==='dash'){ ctx.setLineDash([46,26]); ctx.lineCap='round'; ctx.strokeStyle='#FF6B57'; ctx.lineWidth=14; rr(ctx,50,50,W-100,H-100,50); ctx.stroke(); ctx.setLineDash([]); }
+  ctx.restore();
+  ctx.fillStyle=INK; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  const ts=fitFont(ctx,d.title||'Shopping list',700,96,DISP,W-300,48); ctx.fillText(d.title||'Shopping list',W/2,230);
+  ctx.font=`700 38px ${BODY}`; ctx.fillStyle='#5E5677'; ctx.fillText('For the week of '+nice(fromKey(w.start)), W/2, 296);
+  // layout groups in two columns
+  const gs=GROUPS.map(g=>({g, its:w.items.map(id=>ITEM[id]).filter(it=>it&&it.g===g.id)})).filter(x=>x.its.length);
+  const colX=[120,660], colW=460, top=370; const y=[top,top]; const ROW=64, HEAD=92, GAP=34;
+  gs.forEach(({g,its})=>{
+    const c = y[0]<=y[1]?0:1; let yy=y[c]; const x=colX[c];
+    ctx.fillStyle=g.col; rr(ctx,x,yy,colW,70,35); ctx.fill(); ctx.lineWidth=5; ctx.strokeStyle=INK; ctx.stroke();
+    ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font=`44px ${EMO}`; ctx.fillText(g.e,x+22,yy+37);
+    ctx.fillStyle=INK; ctx.font=`700 42px ${DISP}`; ctx.fillText(g.name,x+86,yy+37);
+    yy+=HEAD;
+    its.forEach(it=>{
+      ctx.lineWidth=5; ctx.strokeStyle=INK; ctx.fillStyle='#FFFFFF'; rr(ctx,x+10,yy,42,42,10); ctx.fill(); ctx.stroke();
+      ctx.font=`38px ${EMO}`; ctx.fillStyle=INK; ctx.fillText(it.e,x+70,yy+23);
+      fitFont(ctx,it.name,700,34,BODY,colW-130,24); ctx.fillText(it.name,x+124,yy+(it.hint?16:23));
+      if(it.hint){ ctx.font=`700 24px ${BODY}`; ctx.fillStyle='#5E5677'; ctx.fillText(it.hint,x+124,yy+48); ctx.fillStyle=INK; }
+      yy+=ROW+(it.hint?16:0);
+    });
+    y[c]=yy+GAP;
+  });
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.fillStyle=INK; ctx.font=`700 34px ${BODY}`;
+  ctx.fillText('Tick each one when it goes in the trolley.', W/2, H-170);
+  ctx.font=`600 28px ${BODY}`; ctx.fillStyle='#5E5677';
+  ctx.fillText('Drinks: water first, plain milk second. Look for "no added sugar" on the label.', W/2, H-122);
+  if(withStickers){ d.stickers.forEach(s=>{ const size=0.12*W*(s.s||1); ctx.save(); ctx.translate(s.x/100*W, s.y/100*H); ctx.rotate((s.r||0)*Math.PI/180); ctx.font=`${size}px ${EMO}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(s.e,0,0); ctx.restore(); }); }
+}
+let fontsReady = false;
+function whenFonts(fn){ if(fontsReady) return fn(); Promise.all([document.fonts.load('700 40px Fredoka'),document.fonts.load('700 30px Nunito')]).catch(()=>{}).then(()=>{fontsReady=true; fn();}); }
+
+async function makePdf(btn){
+  msg={text:'Making your list…',bad:false}; const t=$('#toast'); if(t){t.textContent=msg.text;t.className='toast';}
+  await new Promise(r=>whenFonts(r));
+  const cv=document.createElement('canvas'); cv.width=1240; cv.height=1754; drawList(cv,true);
+  const dl = (window.claude&&window.claude.use) ? await window.claude.use('downloads').catch(()=>null) : null;
+  const fname=(S.profile.name||'My').replace(/[^A-Za-z0-9-]/g,'')+'-shopping-list-'+S.week.start+'.pdf';
+  S.week.made=true; save();
+  if(dl && window.jspdf){
+    try{
+      const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+      pdf.addImage(cv.toDataURL('image/jpeg',.93),'JPEG',0,0,210,297);
+      await dl.save({filename:fname, data:pdf.output('blob')});
+      msg={text:'Saved! Open the PDF and print it.',bad:false}; pdfFallback=null; blip('win'); shopStep='done'; render(); return;
+    }catch(e){
+      if(e&&e.code==='declined'){ msg={text:'Not saved. Tap Print again when you are ready.',bad:true}; shopStep='done'; render(); return; }
+      if(e&&e.code==='rate_limited'){ msg={text:'One moment, then try again.',bad:true}; render(); return; }
+    }
+  }
+  pdfFallback=cv.toDataURL('image/png'); msg={text:'',bad:false}; shopStep='done'; render();
+}
+
+/* packing */
+function lunchFor(k){ return S.lunches[k] || {items:[], packed:false}; }
+function treatUsed(k){ const mon=keyOf(mondayOf(fromKey(k))), sun=keyOf(addDays(mondayOf(fromKey(k)),6));
+  return Object.keys(S.lunches).some(x=>x!==k && x>=mon && x<=sun && S.lunches[x].items.some(id=>ITEM[id]&&ITEM[id].g==='treat')); }
+function lunchReady(L){ return LUNCH.every(r=>{const n=L.items.filter(id=>ITEM[id]&&ITEM[id].g===r.g).length; return n>=r.min&&n<=r.max;}); }
+function mainName(L){
+  const st=L.items.map(i=>ITEM[i]).find(i=>i&&i.g==='energy'), pr=L.items.map(i=>ITEM[i]).find(i=>i&&i.g==='protein'); if(!st||!pr) return '';
+  const P={egg:'egg',chicken:'chicken',tuna:'tuna',mince:'mince',pb:'peanut butter',beans:'bean',fishf:'fish finger',hummus:'hummus'}[pr.id]||pr.name.toLowerCase();
+  const F={bread:P+' sandwich',rolls:P+' roll',wrap:P+' wrap',pita:P+' pita',crackers:'crackers with '+P,pasta:P+' pasta',rice:P+' and rice',potato:'potato with '+P,popcorn:'popcorn and '+P}[st.id] || st.name+' with '+P;
+  return F.charAt(0).toUpperCase()+F.slice(1);
+}
+function bottleSVG(){ return `<svg viewBox="0 0 70 150" aria-hidden="true"><rect x="22" y="4" width="26" height="18" rx="6" fill="#2B2142"/><rect x="10" y="20" width="50" height="124" rx="18" fill="#E1F3FF" stroke="#2B2142" stroke-width="5"/><rect x="15" y="62" width="40" height="76" rx="12" fill="#4AA6F2"/><path d="M18 74 q8 -6 17 0 t17 0" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/></svg>`; }
+function viewPack(){
+  if(!S.week || !S.week.items.length){ return `<div class="title-row"><h1>Pack my lunch</h1></div><div class="panel" style="display:flex;flex-direction:column;gap:14px;align-items:flex-start"><p class="lead">The cupboard is empty. Choose this week's shopping first, then come back to pack.</p><button class="btn hot" data-go="shop">Go shopping</button></div>`; }
+  if(!packDay) packDay=nextSchoolDay(new Date());
+  const k=keyOf(packDay), L=lunchFor(k), p=S.profile;
+  const dayRow=`<div class="daypick"><button class="btn small" data-act="day-prev" aria-label="Earlier day">‹</button><strong>For ${nice(packDay)}</strong><button class="btn small" data-act="day-next" aria-label="Later day">›</button></div>`;
+  if(L.packed){
+    const items=L.items.map(id=>ITEM[id]).filter(Boolean);
+    return `<div class="title-row"><h1>Pack my lunch</h1></div>${dayRow}
+    <section class="done">
+      <div class="stage"><p class="cheer" style="margin:0">All packed!</p><div class="box-wrap static pop">${boxSVG(p)}${stickersHTML(p.stickers,-1)}</div>
+        <p style="margin:0;font-weight:800">${L.awarded?`You earned ${L.awarded} ${L.awarded>1?'stars':'star'} for this lunch.`:''}</p></div>
+      <div class="panel" style="display:flex;flex-direction:column;gap:14px">
+        <h2 style="font-size:26px">Pack list for ${nice(packDay)}</h2>
+        ${mainName(L)?`<p style="margin:0;font-weight:800;font-size:19px">Main: ${esc(mainName(L))}</p>`:''}
+        <ul class="checklist">${items.map(it=>`<li><span class="fe" aria-hidden="true">${it.e}</span>${esc(it.name)}<span class="g">${esc(LR[it.g].label)}</span></li>`).join('')}
+          <li><span class="fe" aria-hidden="true">💧</span>Water bottle<span class="g">Drink</span></li></ul>
+        <div class="row"><button class="btn" data-act="unpack">Change it</button><button class="btn go" data-go="">Done</button></div>
+      </div>
+    </section>`;
+  }
+  const tUsed=treatUsed(k);
+  const wells=LUNCH.map(r=>{const g=G[r.g]; const its=L.items.map(id=>ITEM[id]).filter(it=>it&&it.g===r.g); const full=its.length>=r.min && (r.min>0||its.length>0);
+    const need = r.min===0 ? (r.g==='veg'?'Bonus ★':'Optional') : (its.length>=r.min?'✓':(r.max>1?'1 or 2':'Need 1'));
+    return `<div class="well${full?' full':''}" style="background:${shade(g.col,.72)}"><h3>${r.label}<span>${need}</span></h3><div class="in">${its.length?its.map(it=>`<button data-act="unpick" data-id="${it.id}" aria-label="Take out ${esc(it.name)}" class="pop"><span class="fe" aria-hidden="true">${it.e}</span>${esc(it.name)}</button>`).join(''):`<span class="empty">${r.g==='veg'?'A tiny try-it bite':r.g==='treat'?(tUsed?'Treat used this week':'One a week'):'Empty'}</span>`}</div></div>`;}).join('');
+  const shelf=GROUPS.map(g=>{const its=S.week.items.map(id=>ITEM[id]).filter(it=>it&&it.g===g.id); if(!its.length) return '';
+    return `<div class="shelf-row"><span class="lab"><span class="ce" aria-hidden="true">${g.e}</span>${g.name}</span>${its.map(it=>{const inBox=L.items.includes(it.id); const dis=g.id==='treat'&&tUsed&&!inBox;
+      return `<button class="food" data-act="${inBox?'unpick':'add'}" data-id="${it.id}" style="--gc:${g.col}" aria-pressed="${inBox}" ${dis?'disabled':''}><span class="fe" aria-hidden="true">${it.e}</span>${esc(it.name)}</button>`;}).join('')}</div>`;}).join('');
+  const ready=lunchReady(L);
+  return `<div class="title-row"><h1>Pack my lunch</h1></div>${dayRow}
+  <p class="lead">Tap foods from your shopping to put them in the lunch box. Fill every space that says "Need".</p>
+  <section class="pack">
+    <div class="tray" style="background:${p.color}">${wells}</div>
+    <div class="bottle">${bottleSVG()}<span>Water is the best drink</span></div>
+  </section>
+  <section class="panel shelf"><h2 style="font-size:24px">From my shopping</h2>${shelf}</section>
+  <div class="dock"><div class="panel">
+    <span class="toast ${msg.bad?'bad':''}" id="toast" style="flex:1">${esc(msg.text || (ready? (mainName(L)? mainName(L)+'. Yum! Ready to close the lid.':'Ready to close the lid.') : 'Keep packing.'))}</span>
+    <button class="btn go" data-act="close-lid" ${ready?'':'disabled'}>Close the lid</button>
+  </div></div>`;
+}
+
+/* ---------- after render: boards + canvas ---------- */
+function afterRender(){
+  const board=$('#board');
+  if(board){
+    const list = route==='box' ? S.profile.stickers : S.deco.stickers;
+    bindBoard(board, list, ()=>{ $('#selbar').innerHTML=selbarHTML(list); if(sel<0) board.querySelectorAll('.stk').forEach(x=>x.classList.remove('sel')); });
+  }
+  const cv=$('#paperCv'); if(cv) whenFonts(()=>drawList(cv, !!cv.dataset.full));
+  const ni=$('#nameIn'); if(ni) ni.addEventListener('input',()=>{ S.profile.name=ni.value.slice(0,14); save();
+    const b=$('#board'); b.querySelector('svg').outerHTML=boxSVG(S.profile); $('#appName').textContent=(S.profile.name||'My')+"'s Lunch Box"; });
+  const ti=$('#titleIn'); if(ti) ti.addEventListener('input',()=>{ S.deco.title=ti.value.slice(0,28); save(); drawList($('#paperCv'),false); });
+}
+
+/* ---------- events ---------- */
+function say(text,bad){ msg={text,bad:!!bad}; }
+document.addEventListener('click', e=>{
+  const go=e.target.closest('[data-go]');
+  if(go){ e.preventDefault(); location.hash = go.dataset.go ? '#'+go.dataset.go : '#home'; return; }
+  const b=e.target.closest('[data-act]'); if(!b||b.disabled) return;
+  const act=b.dataset.act, v=b.dataset.v, id=b.dataset.id;
+  const p=S.profile;
+  if(act.startsWith('stk-')){
+    const list = route==='box' ? p.stickers : S.deco.stickers;
+    const warn=stickerAct(act, list, b); save();
+    const board=$('#board');
+    if(board){ board.querySelectorAll('.stk').forEach(x=>x.remove()); board.insertAdjacentHTML('beforeend', stickersHTML(list, sel)); $('#selbar').innerHTML= warn? `<span class="toast bad">${esc(warn)}</span>` : selbarHTML(list); }
+    return;
+  }
+  switch(act){
+    case 'shape': p.shape=v; break;
+    case 'color': p.color=v; break;
+    case 'pattern': p.pattern=v; break;
+    case 'paper': S.deco.paper=v; break;
+    case 'border': S.deco.border=v; break;
+    case 'sound': S.sound=!S.sound; break;
+    case 'reset': confirmReset=true; render(); return;
+    case 'reset-no': confirmReset=false; render(); return;
+    case 'reset-yes': S=fresh(); S.updatedAt=Date.now(); confirmReset=false; sel=-1; save(); if(ref) ref.set(JSON.parse(JSON.stringify(S))).catch(()=>{}); render(); return;
+    case 'ask-new': confirmReset=true; render(); return;
+    case 'new-week': S.week={start:keyOf(shopWeekStart()), items:[], made:false}; confirmReset=false; shopStep='pick'; pdfFallback=null; say(''); break;
+    case 'pick': {
+      const it=ITEM[id], g=G[it.g], w=S.week; const has=w.items.indexOf(id);
+      if(has>=0){ w.items.splice(has,1); say(''); blip('pop'); }
+      else if(groupCount(g.id)>=g.max){ say(g.max===1? 'Only one treat a week. Take the other one out first.' : `That's enough ${g.name.toLowerCase()}. Take one out to swap.`, true); blip('no'); b.classList.add('wiggle'); setTimeout(()=>b.classList.remove('wiggle'),400); const t=$('#toast'); if(t){t.textContent=msg.text;t.className='toast bad';} return; }
+      else { w.items.push(id); blip('pop'); say(weekBalancedAfter()? 'Every food group is happy. Time to decorate!' : ''); }
+      w.made=false; save(); const y=window.scrollY; render(); window.scrollTo(0,y); return;
+    }
+    case 'to-deco': shopStep='decorate'; sel=-1; say(''); pdfFallback=null; render(); window.scrollTo(0,0); return;
+    case 'to-pick': shopStep='pick'; sel=-1; say(''); pdfFallback=null; render(); window.scrollTo(0,0); return;
+    case 'make-pdf': makePdf(b); return;
+    case 'day-prev': packDay=stepSchoolDay(packDay,-1); say(''); break;
+    case 'day-next': packDay=stepSchoolDay(packDay,1); say(''); break;
+    case 'add': {
+      const k=keyOf(packDay); const L=S.lunches[k]=lunchFor(k); const it=ITEM[id], r=LR[it.g];
+      const inG=L.items.filter(x=>ITEM[x]&&ITEM[x].g===it.g);
+      if(it.g==='treat'&&treatUsed(k)){ say('The treat is already in another lunch this week.',true); blip('no'); break; }
+      if(inG.length>=r.max){ if(r.max===1){ L.items=L.items.filter(x=>x!==inG[0]); } else { say(`The ${r.label.toLowerCase()} space is full. Tap one to take it out.`,true); blip('no'); const y=window.scrollY; render(); window.scrollTo(0,y); return; } }
+      L.items.push(id); blip('pop'); say(''); save(); const y=window.scrollY; render(); window.scrollTo(0,y); return;
+    }
+    case 'unpick': {
+      if(route==='pack'){ const k=keyOf(packDay); const L=lunchFor(k); L.items=L.items.filter(x=>x!==id); S.lunches[k]=L; say(''); save(); const y=window.scrollY; render(); window.scrollTo(0,y); return; }
+      break;
+    }
+    case 'close-lid': {
+      const k=keyOf(packDay); const L=lunchFor(k); if(!lunchReady(L)) return;
+      L.packed=true; if(!L.awarded){ const veg=L.items.some(x=>ITEM[x]&&ITEM[x].g==='veg'); L.awarded=1+(veg?1:0); S.stars+=L.awarded; }
+      S.lunches[k]=L; blip('win'); say(''); save(); render(); window.scrollTo(0,0); return;
+    }
+    case 'unpack': { const k=keyOf(packDay); const L=lunchFor(k); L.packed=false; S.lunches[k]=L; save(); break; }
+  }
+  save(); render();
+});
+function weekBalancedAfter(){ return weekBalanced(); }
+
+function onRoute(){ const h=(location.hash||'').replace('#',''); route=['box','shop','pack'].includes(h)?h:''; sel=-1; confirmReset=false; pdfFallback=null; say('');
+  if(route==='shop') shopStep = (S.week&&S.week.made)?'done':'pick'; if(route==='pack') packDay=nextSchoolDay(new Date());
+  render(); window.scrollTo(0,0); }
+window.addEventListener('hashchange', onRoute);
+onRoute();
+connect();
+})();
+</script>
