@@ -38,7 +38,7 @@ NEGATIVE = re.compile(
     r"\bfall|\bdrop|crash|slump|\bdown\b|weak|delay|congest|shortage|restrict|red flag|\bfad\b|"
     r"lower than|slow|criticis|controvers|negative|problem|concern|dried out|mixed|clearance|matur|fading|\bfade|"
     r"peaked|no spike|no new|no fresh|no separate|quiet|flat\b|stall|cool(ing|ed)|saturat|discount|markdown|"
-    r"too close|too late|uncertain|unclear|not found|unknown|\bno \d{4}\b|moving (away )?from|shift(ing|s)? away|moved on",
+    r"too close|too late|uncertain|unclear|not found|unknown|\bno \d{4}\b|moving (away )?from|shift(ing|s)? away|moved on|has moved to|not spik|not yet out|is due|due mid",
     re.I,
 )
 SENSITIVE = re.compile(
